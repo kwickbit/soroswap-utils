@@ -1,0 +1,17 @@
+{
+  "name": "sorocury",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@stellar/stellar-sdk": "^12.3.0"
+  }
+}
