@@ -1,5 +1,5 @@
 {
-  "name": "sorocury",
+  "name": "soroswap-utils",
   "module": "src/index.ts",
   "type": "module",
   "scripts": {

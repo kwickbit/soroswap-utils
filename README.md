@@ -1,15 +1,5 @@
-# sorobun
+# soroswap-utils
 
-To install dependencies:
+This library provides utilities to interact with Soroswap, the decentralized exchange (DEX) on Soroban, which is the smart contracts platform of the Stellar network.
 
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.1.30. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+In order to use the library, you'll need to provide a private key in your `.env` file, and also the other variables already present in `.env.example`.
