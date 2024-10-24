@@ -3,7 +3,8 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "start": "bun run src/index.ts"
+    "start": "bun run src/index.ts",
+    "tsn": "node --loader ts-node/esm src/mercury.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"
@@ -12,6 +13,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@stellar/stellar-sdk": "^12.3.0"
+    "@stellar/stellar-sdk": "^12.3.0",
+    "dotenv": "^16.4.5",
+    "ts-node": "^10.9.2"
   }
 }
