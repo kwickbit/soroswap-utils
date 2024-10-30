@@ -13,8 +13,8 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.21.0",
     "@stellar/stellar-sdk": "^12.3.0",
-    "dotenv": "^16.4.5",
     "ts-node": "^10.9.2"
   }
 }
