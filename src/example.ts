@@ -7,6 +7,7 @@ import "dotenv/config";
         graphqlEndpoint: process.env.MERCURY_GRAPHQL_ENDPOINT!,
         email: process.env.MERCURY_TESTER_EMAIL!,
         password: process.env.MERCURY_TESTER_PASSWORD!,
+        apiKey: process.env.MERCURY_API_KEY!,
     });
 
     const response = await mercury?.subscribeToContractEvents({
