@@ -3,11 +3,14 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
+    "docs": "typedoc --out docs src",
+    "docs:serve": "npx serve docs",
     "start": "bun run src/index.ts",
     "tsn": "node --loader ts-node/esm src/example.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typedoc": "^0.26.11"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
