@@ -3,21 +3,19 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
-    "docs": "typedoc --out docs src",
+    "docs": "typedoc --out docs src --skipErrorChecking",
     "docs:serve": "npx serve docs",
     "start": "bun run src/index.ts",
     "tsn": "node --loader ts-node/esm src/example.ts"
   },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "typedoc": "^0.26.11"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.21.0",
-    "@stellar/stellar-sdk": "^12.3.0",
-    "ts-node": "^10.9.2"
+    "@stellar/stellar-sdk": "^12.3.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "ts-node": "^10.9.2",
+    "typedoc": "^0.26.11",
+    "typescript": "^5.0.0"
   }
 }
