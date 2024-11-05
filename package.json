@@ -5,7 +5,7 @@
   "scripts": {
     "docs": "typedoc --out docs src --skipErrorChecking",
     "docs:serve": "npx serve docs",
-    "start": "bun run src/index.ts",
+    "start:example": "bun run src/example.ts",
     "tsn": "node --loader ts-node/esm src/example.ts"
   },
   "dependencies": {
