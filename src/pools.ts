@@ -41,7 +41,7 @@ export const getLiquidityPoolCount = async (): Promise<number> => {
  *
  * @returns {Promise<string[]>} A promise that resolves to an array of liquidity pool addresses
  */
-export const getLiquidityPoolAddresses = async () => {
+export const getLiquidityPoolAddresses = async (): Promise<string[]> => {
     const server = new SorobanRpc.Server(process.env.SOROBAN_RPC_SERVER!);
     const contract = new Contract(process.env.SOROSWAP_FACTORY_CONTRACT!);
     const sourceKeypair = Keypair.fromSecret(process.env.PRIVATE_KEY!);
