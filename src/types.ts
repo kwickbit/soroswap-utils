@@ -1,6 +1,5 @@
 // Rule disabled because either I'm not smart enough to make it work,
 // or ESLint is broken, because this is used in the test.
-/* eslint-disable import/no-unused-modules */
 export interface Asset {
     code: string;
     contract?: string;

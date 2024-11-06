@@ -36,4 +36,12 @@ module.exports = {
         "putout/putout": "off",
         "unicorn/import-index": "off",
     },
+
+    settings: {
+        "import/resolver": {
+            typescript: {
+                project: "./tsconfig.eslint.json",
+            },
+        },
+    },
 };
