@@ -27,6 +27,7 @@ module.exports = {
             { assertionStyle: "as", objectLiteralTypeAssertions: "allow" },
         ],
 
+        "@typescript-eslint/no-shadow": ["error", { allow: ["expect"] }],
         "@typescript-eslint/no-throw-literal": "off",
         "compat/compat": "off",
         "func-style": ["error", "declaration", { allowArrowFunctions: true }],
