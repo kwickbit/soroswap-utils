@@ -19,7 +19,7 @@ const cacheTtl =
 //
 // Besides fetching fresh data, we also overwrite the cache file.
 //
-async function fetchAssets() {
+const fetchAssets = async (): Promise<CachedData> => {
     const response = await fetch(soroswapAssetsUrl);
     const data = (await response.json()) as CachedData;
 
@@ -40,9 +40,9 @@ async function fetchAssets() {
     );
 
     return data;
-}
+};
 
-async function getCachedOrFetch() {
+const getCachedOrFetch = async (): Promise<CachedData> => {
     try {
         // First we see if we have cached data from the last 30 days.
         // Soroswap updates their token list relatively infrequently.
@@ -58,7 +58,7 @@ async function getCachedOrFetch() {
     }
 
     return await fetchAssets();
-}
+};
 
 /**
  * Fetches the list of certified assets from the Soroswap token list.

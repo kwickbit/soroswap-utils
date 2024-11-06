@@ -30,7 +30,7 @@ module.exports = {
         "@typescript-eslint/no-shadow": ["error", { allow: ["expect"] }],
         "@typescript-eslint/no-throw-literal": "off",
         "compat/compat": "off",
-        "func-style": ["error", "declaration", { allowArrowFunctions: true }],
+        "func-style": ["error", "expression", { allowArrowFunctions: true }],
         "no-console": "off",
         "prettier/prettier": ["error", { printWidth: maximumLineLength, tabWidth: 4 }],
         "putout/putout": "off",
