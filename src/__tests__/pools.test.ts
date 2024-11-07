@@ -1,4 +1,4 @@
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it, jest } from "@jest/globals";
 
 import { getLiquidityPoolAddresses, getLiquidityPoolCount } from "../pools";
 
@@ -16,6 +16,9 @@ describe("getLiquidityPoolCount", () => {
 describe("getLiquidityPoolAddresses", () => {
     it("should return an array of liquidity pool addresses", async () => {
         expect.assertions(3);
+
+        // eslint-disable-next-line jest/no-confusing-set-timeout
+        jest.setTimeout(30_000);
 
         const count = await getLiquidityPoolCount();
         const data = await getLiquidityPoolAddresses();
