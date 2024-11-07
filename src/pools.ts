@@ -105,5 +105,5 @@ export const getLiquidityPoolAddresses = async (): Promise<string[]> => {
             // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/naming-convention
             async (_unused, index) => await fetchLiquidityPoolAddress(index),
         ),
-    ).then((results) => results.filter((address) => address !== undefined));
+    ).then((results) => results.filter((address): address is string => address !== undefined));
 };

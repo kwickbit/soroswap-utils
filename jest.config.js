@@ -6,6 +6,8 @@ const defaultExport = {
         "^(\\.{1,2}/.*)\\.js$": "$1",
     },
 
+    setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+
     testEnvironment: "node",
 
     transform: {

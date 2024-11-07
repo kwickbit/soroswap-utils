@@ -3,6 +3,7 @@
   "module": "src/index.ts",
   "type": "module",
   "scripts": {
+    "check-typedoc": "bun run src/scripts/check-typedoc.ts",
     "docs": "typedoc --out docs src --skipErrorChecking",
     "docs:serve": "bunx serve docs",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts",
@@ -14,7 +15,9 @@
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.21.0",
-    "@stellar/stellar-sdk": "^12.3.0"
+    "@stellar/stellar-sdk": "^12.3.0",
+    "@types/glob": "^8.1.0",
+    "glob": "^11.0.0"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",
