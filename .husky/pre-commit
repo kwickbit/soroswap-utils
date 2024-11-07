@@ -1,1 +1,2 @@
-echo "The pre-commit hook works!"
+bunx lint-staged
+bun run test

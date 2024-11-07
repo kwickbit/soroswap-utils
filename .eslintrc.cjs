@@ -1,5 +1,3 @@
-"use strict";
-
 const maximumLineLength = 100;
 
 module.exports = {
@@ -7,6 +5,7 @@ module.exports = {
 
     parserOptions: {
         project: "./tsconfig.eslint.json",
+        sourceType: "module",
     },
 
     plugins: ["prettier"],

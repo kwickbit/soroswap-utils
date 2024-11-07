@@ -4,15 +4,13 @@
   "type": "module",
   "scripts": {
     "docs": "typedoc --out docs src --skipErrorChecking",
-    "docs:serve": "npx serve docs",
-    "start:example": "bun run src/example.ts",
-    "tsn": "node --loader ts-node/esm src/example.ts",
-    "test": "jest",
+    "docs:serve": "bunx serve docs",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts",
     "lint:fix": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "start:example": "bun run src/example.ts",
+    "test": "jest",
+    "tsn": "node --loader ts-node/esm src/example.ts"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.21.0",
@@ -32,6 +30,7 @@
     "eslint-plugin-n": "^17.12.0",
     "eslint-plugin-unicorn": "^56.0.0",
     "jest": "^29.0.0",
+    "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
     "ts-jest": "^29.0.0",
     "ts-node": "^10.9.2",
