@@ -1,91 +1,116 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
-import type { CachedData, CacheEntry } from "./types";
+import type {
+    AssetData,
+    CacheEntry,
+    DetailedAsset,
+    MainnetResponse,
+    SimpleAsset,
+    TestnetAsset,
+    TestnetData,
+    TestnetResponse,
+} from "./types";
+import { getEnvironmentVariable } from "./utils";
 
-const soroswapAssetsUrl =
-    "https://raw.githubusercontent.com/soroswap/token-list/main/tokenList.json";
+const isTestnet = getEnvironmentVariable("IS_TESTNET") === "true";
+const cacheDirectory = join(homedir(), ".cache", "soroswap-utils");
 
-const cacheFile = join(homedir(), ".cache", "soroswap-utils", "assets.json");
+// eslint-disable-next-line unicorn/prefer-top-level-await
+void (async () => {
+    try {
+        await access(cacheDirectory);
+    } catch {
+        await mkdir(cacheDirectory);
+    }
+})();
+
+const mainnetCacheFile = join(cacheDirectory, "assets.json");
+const testnetCacheFile = join(cacheDirectory, "testnet-assets.json");
+
 const daysToCache = 30;
 const hoursPerDay = 24;
 const minutesPerHour = 60;
 const secondsPerMinute = 60;
 const millisecondsPerSecond = 1000;
+
 const cacheTtl =
     daysToCache * hoursPerDay * minutesPerHour * secondsPerMinute * millisecondsPerSecond;
+
+const extractTestnetData = (data: TestnetResponse): TestnetData =>
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    data.find((item: Readonly<TestnetData>): boolean => item.network === "testnet")!;
 
 //
 // Besides fetching fresh data, we also overwrite the cache file.
 //
-const fetchAssets = async (): Promise<CachedData> => {
-    const response = await fetch(soroswapAssetsUrl);
-    const data = (await response.json()) as CachedData;
-
-    // Rule disabled because I cannot change the `recursive` parameter name.
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    await mkdir(join(homedir(), ".cache", "soroswap-utils"), { recursive: true });
+const fetchAssets = async (): Promise<AssetData> => {
+    // The env var is the same regardless of the network; the command line
+    // sets the correct one.
+    const response = await fetch(getEnvironmentVariable("SOROSWAP_ASSETS_URL"));
+    const dataFromResponse = (await response.json()) as MainnetResponse | TestnetResponse;
+    const data = isTestnet
+        ? extractTestnetData(dataFromResponse as TestnetResponse)
+        : (dataFromResponse as MainnetResponse);
 
     await writeFile(
-        cacheFile,
+        isTestnet ? testnetCacheFile : mainnetCacheFile,
 
         // Rule disabled because neither I nor Claude AI are smart enough to
         // figure out how to make this work.
         // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
-        JSON.stringify({
-            data,
-            timestamp: Date.now(),
-        }),
+        JSON.stringify({ data, timestamp: Date.now() }),
     );
 
     return data;
 };
 
-const getCachedOrFetch = async (): Promise<CachedData> => {
-    try {
-        // First we see if we have cached data from the last 30 days.
-        // Soroswap updates their token list relatively infrequently.
-        const cached = await readFile(cacheFile, "utf8");
-        const { data, timestamp } = JSON.parse(cached) as CacheEntry;
+const readCache = async (): Promise<CacheEntry> => {
+    const content = await readFile(isTestnet ? testnetCacheFile : mainnetCacheFile, "utf8");
 
-        // If the cache is fresh we return it, otherwise we fetch fresh data.
-        if (Date.now() - timestamp < cacheTtl) {
-            return data;
-        }
-    } catch {
-        // File doesn't exist, can't be read, or invalid JSON - fetch fresh data
-    }
-
-    return await fetchAssets();
+    return JSON.parse(content) as CacheEntry;
 };
+
+const getCachedOrFetch = async (): Promise<AssetData> => {
+    try {
+        const cache = await readCache();
+        const isDataFresh = Date.now() - cache.timestamp < cacheTtl;
+
+        if (!isDataFresh) {
+            return await fetchAssets();
+        }
+
+        if (!isTestnet) {
+            return cache.data as MainnetResponse;
+        }
+
+        return cache.data as TestnetData;
+    } catch {
+        return await fetchAssets();
+    }
+};
+
+const simplifyAssets = (data: AssetData): { assets: SimpleAsset[] } => ({
+    assets: data.assets.map(({ code, contract, issuer }) => ({ code, contract, issuer })),
+});
 
 /**
  * Fetches the list of certified assets from the Soroswap token list.
  * Assets are cached for 30 days.
  * @param shouldReturnSimpleAssets If true, returns a simpler object with only
  * the code and issuer.
- * @returns {Promise<any>} A promise that resolves to the list of certified
- * assets.
+ * @returns {Promise<AssetData | { assets: SimpleAsset[] }>} A promise that
+ * resolves to the list of certified assets.
+ * @throws {Error} If assets cannot be fetched or cached.
  */
 export const listCertifiedAssets = async (
     shouldReturnSimpleAssets = false,
-): Promise<CachedData> => {
+): Promise<AssetData | { assets: SimpleAsset[] }> => {
     try {
-        const data = await getCachedOrFetch();
+        const data: AssetData = await getCachedOrFetch();
 
-        if (!shouldReturnSimpleAssets) {
-            return data;
-        }
-
-        return {
-            assets: data.assets.map(
-                ({ code, issuer }: { readonly code: string; readonly issuer: string }) => ({
-                    code,
-                    issuer,
-                }),
-            ),
-        };
+        return shouldReturnSimpleAssets ? simplifyAssets(data) : data;
     } catch (error) {
         console.error("Failed to get assets:", error);
 
@@ -96,19 +121,42 @@ export const listCertifiedAssets = async (
 /**
  * Checks if a given asset is certified by Soroswap.
  * @param code The asset code.
- * @param issuer The asset issuer.
+ * @param contract The address of the asset contract.
  * @returns {Promise<boolean>} A promise that resolves to true if the asset is
  * certified.
  */
-export const isCertifiedAsset = async (code: string, issuer: string): Promise<boolean> => {
-    if (code === "XLM" && issuer === "Native") {
+export const isCertifiedAsset = async (code: string, contract: string): Promise<boolean> => {
+    if (code === "XLM" && contract === "Native") {
         return true;
     }
 
     const { assets } = await listCertifiedAssets();
 
     return assets.some(
-        (asset: { readonly code: string; readonly issuer: string }) =>
-            asset.code === code && asset.issuer === issuer,
+        (asset: { readonly code: string; readonly contract: string }) =>
+            asset.code === code && asset.contract === contract,
     );
+};
+
+/**
+ * Retrieves data about an asset.
+ *
+ * @param address The address of the asset.
+ * @returns {Promise<AssetData>} A promise that resolves to the data about the
+ * asset.
+ * @throws {Error} If asset not found (in mainnet only)
+ */
+export const getAssetData = async (
+    address: string,
+): Promise<DetailedAsset | TestnetAsset | undefined> => {
+    const soroswapAssets = await getCachedOrFetch();
+    const assetData = soroswapAssets.assets.find((asset) => asset.contract === address);
+
+    // On the testnet it seems possible to create pools with
+    // non-existent assets, so we let them pass through.
+    if (assetData === undefined && !isTestnet) {
+        throw new Error(`Asset from contract ${address} not found`);
+    }
+
+    return assetData;
 };

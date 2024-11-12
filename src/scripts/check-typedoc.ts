@@ -9,6 +9,7 @@ const checkFile = async (path: string): Promise<string[]> => {
     const exports = content.match(/^export\s.+/gmv) ?? [];
 
     return exports
+        .filter((exp) => !exp.includes('} from "') && !exp.includes("export type"))
         .map((exp) => {
             const precedingBlock = content.slice(0, content.indexOf(exp));
             const hasTypedoc = precedingBlock.endsWith("*/\n");

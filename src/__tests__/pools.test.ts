@@ -26,7 +26,8 @@ describe("getLiquidityPoolAddresses", () => {
         expect(data).toBeInstanceOf(Array);
         expect(data).toHaveLength(count);
 
-        // All addresses should start with C and have 55 other characters, upper case and numbers
+        // All addresses should start with C and have 55 other characters,
+        // upper case and numbers
         expect(data.every((address: string) => /^C[\dA-Z]{55}$/v.exec(address))).toBe(true);
     });
 });

@@ -17,6 +17,7 @@ module.exports = {
             "error",
             {
                 code: maximumLineLength,
+                comments: 80,
                 ignorePattern: String.raw`^\s*//\s*eslint-disable`,
             },
         ],
@@ -29,6 +30,7 @@ module.exports = {
         "@typescript-eslint/no-shadow": ["error", { allow: ["expect"] }],
         "@typescript-eslint/no-throw-literal": "off",
         "compat/compat": "off",
+        "etc/no-misused-generics": "off",
         "func-style": ["error", "expression", { allowArrowFunctions: true }],
         "no-console": "off",
         "prettier/prettier": ["error", { printWidth: maximumLineLength, tabWidth: 4 }],

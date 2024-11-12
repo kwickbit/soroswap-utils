@@ -1,33 +1,61 @@
-// Rule disabled because either I'm not smart enough to make it work,
-// or ESLint is broken, because this is used in the test.
-export interface Asset {
-    code: string;
-    contract?: string;
-    decimals?: number;
-    domain?: string;
-    icon?: string;
-    issuer: string;
-    name?: string;
-    org?: string;
+// We give the user the option to get the data in a simpler format.
+interface SimpleAsset {
+    readonly code: string;
+    readonly contract: string;
+    readonly issuer: string;
 }
 
-export interface TokenList {
-    assets: Asset[];
-    description: string;
-    feedback: string;
-    name: string;
-    network: string;
-    provider: string;
-    version: string;
+interface TestnetAsset extends SimpleAsset {
+    readonly decimals: number;
+    readonly icon: string;
+    readonly name: string;
 }
 
-export type CachedData =
-    | TokenList
-    | {
-          assets: Asset[];
-      };
-
-export interface CacheEntry {
-    data: CachedData;
-    timestamp: number;
+interface DetailedAsset extends TestnetAsset {
+    readonly domain: string;
+    readonly org: string;
 }
+
+interface TestnetData {
+    readonly assets: readonly TestnetAsset[];
+    readonly network: "mainnet" | "testnet" | "standalone";
+}
+
+type TestnetResponse = readonly TestnetData[];
+
+interface MainnetResponse {
+    readonly assets: readonly DetailedAsset[];
+    readonly description: string;
+    readonly feedback: string;
+    readonly name: string;
+    readonly network: string;
+    readonly provider: string;
+    readonly version: string;
+}
+
+type AssetData = MainnetResponse | TestnetData;
+
+interface CacheEntry {
+    readonly data: AssetData;
+    readonly timestamp: number;
+}
+
+interface PoolData {
+    constantProductOfReserves: number;
+    firstToken?: DetailedAsset;
+    readonly poolContract: string;
+    reserves: readonly [number, number];
+    secondToken?: DetailedAsset;
+}
+
+export type {
+    AssetData,
+    CacheEntry,
+    DetailedAsset,
+    MainnetResponse,
+    PoolData,
+    SimpleAsset,
+    TestnetAsset,
+    TestnetData,
+    TestnetResponse,
+};
