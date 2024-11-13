@@ -173,25 +173,29 @@ export const getLiquidityPoolData = async (address: string): Promise<PoolData> =
         functionName: "k_last",
     });
 
-    const token0Address = await callContract<string>({
+    const firstTokenAddress = await callContract<string>({
         ...baseArguments,
         functionName: "token_0",
     });
 
     // The functions only give us the addresses, which we use to fetch the
     // asset data.
-    const token0Data = await getAssetData(token0Address);
+    const firstTokenData = await getAssetData(firstTokenAddress);
 
-    poolData.firstToken = token0Data ? { ...testnetPlaceholderData, ...token0Data } : token0Data;
+    poolData.firstToken = firstTokenData
+        ? { ...testnetPlaceholderData, ...firstTokenData }
+        : firstTokenData;
 
-    const token1Address = await callContract<string>({
+    const secondTokenAddress = await callContract<string>({
         ...baseArguments,
         functionName: "token_1",
     });
 
-    const token1Data = await getAssetData(token1Address);
+    const secondTokenData = await getAssetData(secondTokenAddress);
 
-    poolData.secondToken = token1Data ? { ...testnetPlaceholderData, ...token1Data } : token1Data;
+    poolData.secondToken = secondTokenData
+        ? { ...testnetPlaceholderData, ...secondTokenData }
+        : secondTokenData;
 
     return poolData;
 };
