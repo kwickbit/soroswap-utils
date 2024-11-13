@@ -4,6 +4,7 @@ export { getAssetData, isCertifiedAsset, listCertifiedAssets } from "./assets";
 export { getLiquidityPoolAddresses, getLiquidityPoolCount, getLiquidityPoolData } from "./pools";
 export {
     getSoroswapFactoryEvents,
+    getSoroswapRouterEvents,
     subscribeToSoroswapFactory,
     subscribeToSoroswapRouter,
 } from "./subscriptions";
