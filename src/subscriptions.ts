@@ -1,18 +1,22 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import { Mercury } from "mercury-sdk";
+import { getContractEventsParser, Mercury } from "mercury-sdk";
 
 import { getEnvironmentVariable } from "./utils";
 
-const soroswapSubscriber = (environmentVariable: string) => async () => {
+const buildMercuryInstance = (): Mercury => {
     const mercuryArguments = {
         apiKey: getEnvironmentVariable("MERCURY_API_KEY"),
         backendEndpoint: getEnvironmentVariable("MERCURY_BACKEND_ENDPOINT"),
         graphqlEndpoint: getEnvironmentVariable("MERCURY_GRAPHQL_ENDPOINT"),
     };
 
-    const mercury = new Mercury(mercuryArguments);
+    return new Mercury(mercuryArguments);
+};
 
-    const response = await mercury.subscribeToContractEvents({
+const soroswapSubscriber = (environmentVariable: string) => async () => {
+    const mercuryInstance = buildMercuryInstance();
+
+    const response = await mercuryInstance.subscribeToContractEvents({
         contractId: getEnvironmentVariable(environmentVariable),
     });
 
@@ -36,3 +40,26 @@ export const subscribeToSoroswapFactory = async (): Promise<boolean> =>
  */
 export const subscribeToSoroswapRouter = async (): Promise<boolean> =>
     await soroswapSubscriber("SOROSWAP_ROUTER_CONTRACT")();
+
+/**
+ * Retrieve Soroswap Factory contract events.
+ * @returns {Promise<unknown>} A promise that resolves to the event array.
+ * @throws {Error} If the events cannot be read.
+ */
+export const getSoroswapFactoryEvents = async (): Promise<unknown> => {
+    const mercuryInstance = buildMercuryInstance();
+
+    const soroswapEvents = await mercuryInstance.getContractEvents({
+        contractId: getEnvironmentVariable("SOROSWAP_FACTORY_CONTRACT"),
+    });
+
+    if (soroswapEvents.error !== undefined) {
+        throw new Error(soroswapEvents.error);
+    }
+
+    if (soroswapEvents.data === null) {
+        throw new Error("No events found");
+    }
+
+    return getContractEventsParser(soroswapEvents.data);
+};
