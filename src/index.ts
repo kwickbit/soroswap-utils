@@ -3,4 +3,8 @@
 export { getAssetData, isCertifiedAsset, listCertifiedAssets } from "./assets";
 export { getSoroswapFactoryEvents, getSoroswapRouterEvents } from "./events";
 export { getLiquidityPoolAddresses, getLiquidityPoolCount, getLiquidityPoolData } from "./pools";
-export { subscribeToSoroswapFactory, subscribeToSoroswapRouter } from "./subscriptions";
+export {
+    subscribeToSoroswapFactory,
+    subscribeToSoroswapPair,
+    subscribeToSoroswapRouter,
+} from "./subscriptions";

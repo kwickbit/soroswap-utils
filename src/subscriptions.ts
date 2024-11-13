@@ -1,10 +1,13 @@
 import { buildMercuryInstance, getEnvironmentVariable } from "./utils";
 
-const soroswapSubscriber = async (environmentVariable: string): Promise<boolean> => {
+const soroswapSubscriber = async (
+    contractId: string,
+    isEnvironmentVariable = false,
+): Promise<boolean> => {
     const mercuryInstance = buildMercuryInstance();
 
     const response = await mercuryInstance.subscribeToContractEvents({
-        contractId: getEnvironmentVariable(environmentVariable),
+        contractId: isEnvironmentVariable ? getEnvironmentVariable(contractId) : contractId,
     });
 
     return response.data as boolean;
@@ -17,7 +20,7 @@ const soroswapSubscriber = async (environmentVariable: string): Promise<boolean>
  * subscription was successful.
  */
 export const subscribeToSoroswapFactory = async (): Promise<boolean> =>
-    await soroswapSubscriber("SOROSWAP_FACTORY_CONTRACT");
+    await soroswapSubscriber("SOROSWAP_FACTORY_CONTRACT", true);
 
 /**
  * The Soroswap Router contract emits events when a swap is executed.
@@ -26,4 +29,14 @@ export const subscribeToSoroswapFactory = async (): Promise<boolean> =>
  * subscription was successful.
  */
 export const subscribeToSoroswapRouter = async (): Promise<boolean> =>
-    await soroswapSubscriber("SOROSWAP_ROUTER_CONTRACT");
+    await soroswapSubscriber("SOROSWAP_ROUTER_CONTRACT", true);
+
+/**
+ * Soroswap Pair contracts emit events for operations such as adding or
+ * removing liquidity, swapping, or skimming.
+ * Use this function to subscribe to those events.
+ * @returns {Promise<boolean>} A promise that resolves to true if the
+ * subscription was successful.
+ */
+export const subscribeToSoroswapPair = async (pairContract: string): Promise<boolean> =>
+    await soroswapSubscriber(pairContract);
