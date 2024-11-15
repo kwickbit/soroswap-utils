@@ -44,14 +44,14 @@ export const subscribeToSoroswapPair = async (pairContract: string): Promise<boo
 
 /**
  * Subscribe to multiple SoroswapPair contracts.
- * @param pairContracts An array of contract IDs to subscribe to.
+ * @param contractIds An array of contract IDs to subscribe to.
  * @returns {Promise<boolean>} A promise that resolves to true if all
  * subscriptions were successful.
  */
 export const subscribeToSoroswapPairs = async (
-    pairContracts: readonly string[],
+    contractIds: readonly string[],
 ): Promise<boolean> => {
-    const promises = pairContracts.map(
+    const promises = contractIds.map(
         async (pairContract) => await soroswapSubscriber(pairContract),
     );
 
@@ -101,14 +101,10 @@ export const contractSubscriber = (
 ): { promises: Promise<boolean>[]; subscriptions: string[] } => {
     switch (typeof contractType) {
         case "string": {
-            console.log(contractType);
-
             return doStringContractType(contractType, subscriptions, promises);
         }
         case "object": {
             const pairsToSubscribeTo = contractType.pair ?? contractType.SoroswapPair;
-
-            console.log(contractType);
 
             return {
                 promises: [...promises, subscribeToSoroswapPairs(pairsToSubscribeTo)],
@@ -140,9 +136,5 @@ export const subscribeToSoroswapContracts = async (
         subscriptions: [] as string[],
     });
 
-    return await Promise.all(returnedPromises).then((results) => {
-        console.log(results);
-
-        return results.every(Boolean);
-    });
+    return await Promise.all(returnedPromises).then((results) => results.every(Boolean));
 };
