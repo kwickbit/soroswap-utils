@@ -72,9 +72,8 @@ const setVariables = (address: string) => ({
  * Retrieves the total number of liquidity pools from the Soroswap Factory
  * contract's storage, returning the total number of pairs.
  *
- * @returns {Promise<number>} A promise that resolves to the total number of
- * liquidity pools.
- * @throws {Error} If the contract data cannot be read.
+ * @returns A promise that resolves to the total number of liquidity pools.
+ * @throws If the contract data cannot be read.
  */
 export const getLiquidityPoolCount = async (): Promise<number> => {
     const { val: value } = await new SorobanRpc.Server(
@@ -101,8 +100,7 @@ export const getLiquidityPoolCount = async (): Promise<number> => {
  * Since there is no function to do that directly, this function fetches the
  * addresses by iterating through all pairs using their index.
  *
- * @returns {Promise<string[]>} A promise that resolves to an array of liquidity
- * pool addresses.
+ * @returns A promise that resolves to an array of liquidity pool addresses.
  */
 export const getLiquidityPoolAddresses = async (): Promise<string[]> => {
     const server = new SorobanRpc.Server(getEnvironmentVariable("SOROBAN_RPC_SERVER"));
@@ -154,10 +152,8 @@ export const getLiquidityPoolAddresses = async (): Promise<string[]> => {
  * Retrieves data about a liquidity pool.
  *
  * @param address The address of the liquidity pool.
- * @returns {Promise<PoolData>} A promise that resolves to the data about the
- * liquidity pool.
- * @throws {Error} If any contract call fails or if asset data cannot
- * be retrieved.
+ * @returns A promise that resolves to the data about the liquidity pool.
+ * @throws If any contract call fails or if asset data cannot be retrieved.
  */
 export const getLiquidityPoolData = async (address: string): Promise<PoolData> => {
     const { baseArguments, poolData, testnetPlaceholderData } = setVariables(address);

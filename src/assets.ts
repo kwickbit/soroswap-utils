@@ -100,9 +100,8 @@ const simplifyAssets = (data: AssetData): { assets: SimpleAsset[] } => ({
  * Assets are cached for 30 days.
  * @param shouldReturnSimpleAssets If true, returns a simpler object with only
  * the code and issuer.
- * @returns {Promise<AssetData | { assets: SimpleAsset[] }>} A promise that
- * resolves to the list of certified assets.
- * @throws {Error} If assets cannot be fetched or cached.
+ * @returns A promise that resolves to the list of certified assets.
+ * @throws If assets cannot be fetched or cached.
  */
 export const listCertifiedAssets = async (
     shouldReturnSimpleAssets = false,
@@ -122,8 +121,7 @@ export const listCertifiedAssets = async (
  * Checks if a given asset is certified by Soroswap.
  * @param code The asset code.
  * @param contract The address of the asset contract.
- * @returns {Promise<boolean>} A promise that resolves to true if the asset is
- * certified.
+ * @returns A promise that resolves to true if the asset is certified.
  */
 export const isCertifiedAsset = async (code: string, contract: string): Promise<boolean> => {
     if (code === "XLM" && contract === "Native") {
@@ -142,9 +140,8 @@ export const isCertifiedAsset = async (code: string, contract: string): Promise<
  * Retrieves data about an asset.
  *
  * @param address The address of the asset.
- * @returns {Promise<AssetData>} A promise that resolves to the data about the
- * asset.
- * @throws {Error} If asset not found (in mainnet only)
+ * @returns A promise that resolves to the data about the asset.
+ * @throws If asset not found (in mainnet only)
  */
 export const getAssetData = async (
     address: string,

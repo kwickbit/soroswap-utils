@@ -6,7 +6,7 @@ import { Mercury } from "mercury-sdk";
  * @param value The value to validate.
  * @param errorMessage The error message to throw.
  * @returns The input string, if it is valid.
- * @throws {Error} If the input string is empty or not even a string.
+ * @throws If the input string is empty or not even a string.
  */
 export const validateString = (value: unknown, errorMessage: string): string => {
     if (typeof value !== "string" || value.length === 0) {
@@ -20,7 +20,7 @@ export const validateString = (value: unknown, errorMessage: string): string => 
  * Retrieves an environment variable, throwing an error if it is not defined.
  * @param name The name of the environment variable.
  * @returns The value of the environment variable.
- * @throws {Error} If the environment variable is not defined.
+ * @throws If the environment variable is not defined.
  */
 export const getEnvironmentVariable = (name: string): string => {
     const {
@@ -33,7 +33,7 @@ export const getEnvironmentVariable = (name: string): string => {
 /**
  * Builds a Mercury instance, used to subscribe to contracts and read
  * their events.
- * @returns {Mercury} A Mercury instance.
+ * @returns A Mercury instance.
  */
 export const buildMercuryInstance = (): Mercury => {
     const mercuryArguments = {

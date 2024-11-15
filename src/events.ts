@@ -27,16 +27,16 @@ const fetchSoroswapEvents = async (
 
 /**
  * Retrieve Soroswap Factory contract events.
- * @returns {Promise<unknown>} A promise that resolves to the event array.
- * @throws {Error} If the events cannot be read.
+ * @returns A promise that resolves to the event array.
+ * @throws If the events cannot be read.
  */
 export const getSoroswapFactoryEvents = async (): Promise<unknown> =>
     await fetchSoroswapEvents("SOROSWAP_FACTORY_CONTRACT", true);
 
 /**
  * Retrieve Soroswap Router contract events.
- * @returns {Promise<unknown>} A promise that resolves to the event array.
- * @throws {Error} If the events cannot be read.
+ * @returns A promise that resolves to the event array.
+ * @throws If the events cannot be read.
  */
 export const getSoroswapRouterEvents = async (): Promise<unknown> =>
     await fetchSoroswapEvents("SOROSWAP_ROUTER_CONTRACT", true);
@@ -44,9 +44,9 @@ export const getSoroswapRouterEvents = async (): Promise<unknown> =>
 /**
  * Retrieve events from a given Soroswap Pair contract.
  * @param contractId The contract ID of the Soroswap Pair contract.
- * @returns {Promise<unknown>} A promise that resolves to the event array,
+ * @returns A promise that resolves to the event array,
  * tagged with its contract ID.
- * @throws {Error} If the events cannot be read.
+ * @throws If the events cannot be read.
  */
 export const getSoroswapPairEvents = async (contractId: string): Promise<unknown> => {
     const rawEvents = (await fetchSoroswapEvents(contractId)) as { [key: string]: unknown }[];
@@ -58,8 +58,8 @@ export const getSoroswapPairEvents = async (contractId: string): Promise<unknown
  * Retrieve events from multiple SoroswapPair
  * contracts.
  * @param contractIds An array of contract IDs to subscribe to.
- * @returns {Promise<unknown>} A promise that resolves to the flat event array.
- * @throws {Error} If the events cannot be read.
+ * @returns A promise that resolves to the flat event array.
+ * @throws If the events cannot be read.
  */
 export const getEventsFromSoroswapPairs = async (
     contractIds: readonly string[],
@@ -139,8 +139,8 @@ export const eventFetcher = (
  *  - the strings "SoroswapRouter" or "router"
  *  - an object with either the key "SoroswapPair" or just "pair" and the value
  *    an array of contract IDs to subscribe to.
- * @returns {Promise<unknown>} A promise that resolves to the flat event array.
- * @throws {Error} If the events cannot be read.
+ * @returns A promise that resolves to the flat event array.
+ * @throws If the events cannot be read.
  */
 export const getEventsFromSoroswapContracts = async (
     contractTypes: readonly SoroswapContract[],

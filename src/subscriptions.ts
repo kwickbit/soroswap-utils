@@ -17,8 +17,7 @@ const soroswapSubscriber = async (
 /**
  * The Soroswap Factory contract emits events when a new pool is created.
  * Use this function to subscribe to those events.
- * @returns {Promise<boolean>} A promise that resolves to true if the
- * subscription was successful.
+ * @returns A promise that resolves to true if the subscription was successful.
  */
 export const subscribeToSoroswapFactory = async (): Promise<boolean> =>
     await soroswapSubscriber("SOROSWAP_FACTORY_CONTRACT", true);
@@ -26,8 +25,7 @@ export const subscribeToSoroswapFactory = async (): Promise<boolean> =>
 /**
  * The Soroswap Router contract emits events when a swap is executed.
  * Use this function to subscribe to those events.
- * @returns {Promise<boolean>} A promise that resolves to true if the
- * subscription was successful.
+ * @returns A promise that resolves to true if the subscription was successful.
  */
 export const subscribeToSoroswapRouter = async (): Promise<boolean> =>
     await soroswapSubscriber("SOROSWAP_ROUTER_CONTRACT", true);
@@ -36,8 +34,7 @@ export const subscribeToSoroswapRouter = async (): Promise<boolean> =>
  * Soroswap Pair contracts emit events for operations such as adding or
  * removing liquidity, swapping, or skimming.
  * Use this function to subscribe to those events.
- * @returns {Promise<boolean>} A promise that resolves to true if the
- * subscription was successful.
+ * @returns A promise that resolves to true if the subscription was successful.
  */
 export const subscribeToSoroswapPair = async (pairContract: string): Promise<boolean> =>
     await soroswapSubscriber(pairContract);
@@ -45,8 +42,8 @@ export const subscribeToSoroswapPair = async (pairContract: string): Promise<boo
 /**
  * Subscribe to multiple SoroswapPair contracts.
  * @param contractIds An array of contract IDs to subscribe to.
- * @returns {Promise<boolean>} A promise that resolves to true if all
- * subscriptions were successful.
+ * @returns A promise that resolves to true if all subscriptions
+ * were successful.
  */
 export const subscribeToSoroswapPairs = async (
     contractIds: readonly string[],
@@ -126,8 +123,8 @@ export const contractSubscriber = (
  *  - the strings "SoroswapRouter" or "router"
  *  - an object with either the key "SoroswapPair" or just "pair" and the value
  *    an array of contract IDs to subscribe to.
- * @returns {Promise<boolean>} A promise that resolves to true if all
- * subscriptions were successful.
+ * @returns A promise that resolves to true if all subscriptions
+ * were successful.
  */
 export const subscribeToSoroswapContracts = async (
     contractTypes: readonly SoroswapContract[],
