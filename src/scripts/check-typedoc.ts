@@ -13,10 +13,11 @@ const checkFile = async (path: string): Promise<string[]> => {
         .map((exp) => {
             const precedingBlock = content.slice(0, content.indexOf(exp));
             const hasTypedoc = precedingBlock.endsWith("*/\n");
+            const hasEslintDisable = precedingBlock.includes("// eslint-disable-next-line");
 
             const { length: lineNumber } = precedingBlock.split("\n");
 
-            return hasTypedoc
+            return hasTypedoc || hasEslintDisable
                 ? undefined
                 : `${path}:${lineNumber} - Export missing typedoc comment`;
         })

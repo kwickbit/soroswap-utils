@@ -1,7 +1,13 @@
 const maximumLineLength = 100;
 
 module.exports = {
-    extends: ["hardcore", "hardcore/ts", "hardcore/jest", "prettier"],
+    extends: [
+        "hardcore",
+        "hardcore/ts",
+        "hardcore/jest",
+        "plugin:@typescript-eslint/recommended-type-checked",
+        "prettier",
+    ],
 
     parserOptions: {
         project: "./tsconfig.eslint.json",
@@ -29,6 +35,12 @@ module.exports = {
 
         "@typescript-eslint/no-shadow": ["error", { allow: ["expect"] }],
         "@typescript-eslint/no-throw-literal": "off",
+
+        "@typescript-eslint/switch-exhaustiveness-check": [
+            "error",
+            { considerDefaultExhaustiveForUnions: true },
+        ],
+
         "compat/compat": "off",
         "etc/no-misused-generics": "off",
         "func-style": ["error", "expression", { allowArrowFunctions: true }],

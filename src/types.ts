@@ -1,3 +1,15 @@
+type SoroswapFactoryContract = "SoroswapFactory" | "factory";
+
+type SoroswapRouterContract = "SoroswapRouter" | "router";
+
+type SoroswapPairContract =
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    | { readonly pair: readonly string[]; readonly SoroswapPair?: never }
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    | { readonly pair?: never; readonly SoroswapPair: readonly string[] };
+
+type SoroswapContract = SoroswapFactoryContract | SoroswapRouterContract | SoroswapPairContract;
+
 // We give the user the option to get the data in a simpler format.
 interface SimpleAsset {
     readonly code: string;
@@ -55,6 +67,7 @@ export type {
     MainnetResponse,
     PoolData,
     SimpleAsset,
+    SoroswapContract,
     TestnetAsset,
     TestnetData,
     TestnetResponse,
