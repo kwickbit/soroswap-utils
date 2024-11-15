@@ -120,7 +120,8 @@ export const contractSubscriber = (
 
 /**
  * Subscribe to Soroswap contracts of the given types.
- * @param contractTypes The types of contracts to subscribe to. These can be:
+ * @param contractTypes An array of types of contracts to subscribe to.
+ * These can be:
  *  - the strings "SoroswapFactory" or "factory"
  *  - the strings "SoroswapRouter" or "router"
  *  - an object with either the key "SoroswapPair" or just "pair" and the value

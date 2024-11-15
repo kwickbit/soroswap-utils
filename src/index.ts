@@ -2,6 +2,7 @@
 /* eslint-disable import/no-unused-modules */
 export { getAssetData, isCertifiedAsset, listCertifiedAssets } from "./assets";
 export {
+    getEventsFromSoroswapContracts,
     getEventsFromSoroswapPairs,
     getSoroswapFactoryEvents,
     getSoroswapPairEvents,
