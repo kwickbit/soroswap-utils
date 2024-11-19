@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { getContractEventsParser } from "mercury-sdk";
 
-import { parseFactoryEvent } from "./parsers";
+import { parseFactoryEvent } from "./event_parsers/factory";
 import type { SoroswapContract } from "./types";
 import { buildMercuryInstance, getEnvironmentVariable } from "./utils";
 
