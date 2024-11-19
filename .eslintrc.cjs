@@ -35,6 +35,7 @@ module.exports = {
 
         "@typescript-eslint/no-shadow": ["error", { allow: ["expect"] }],
         "@typescript-eslint/no-throw-literal": "off",
+        "@typescript-eslint/non-nullable-type-assertion-style": "off",
 
         "@typescript-eslint/switch-exhaustiveness-check": [
             "error",

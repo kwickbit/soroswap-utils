@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { getContractEventsParser } from "mercury-sdk";
 
+import { parseFactoryEvent } from "./parsers";
 import type { SoroswapContract } from "./types";
 import { buildMercuryInstance, getEnvironmentVariable } from "./utils";
 
@@ -30,8 +31,13 @@ const fetchSoroswapEvents = async (
  * @returns A promise that resolves to the event array.
  * @throws If the events cannot be read.
  */
-export const getSoroswapFactoryEvents = async (): Promise<unknown> =>
-    await fetchSoroswapEvents("SOROSWAP_FACTORY_CONTRACT", true);
+export const getSoroswapFactoryEvents = async (): Promise<unknown> => {
+    const rawEvents = (await fetchSoroswapEvents("SOROSWAP_FACTORY_CONTRACT", true)) as {
+        [key: string]: unknown;
+    }[];
+
+    return await Promise.all(rawEvents.map(parseFactoryEvent));
+};
 
 /**
  * Retrieve Soroswap Router contract events.
