@@ -11,23 +11,19 @@ import {
     xdr,
 } from "@stellar/stellar-sdk";
 
-import { getAssetData } from "./assets";
-import type { PoolData } from "./types";
+import { getAssetData as readAssetData } from "./assets";
+import type { Asset, PoolData } from "./types";
 import { getEnvironmentVariable, validateString } from "./utils";
-
-interface CallContractParameters {
-    readonly contract: Readonly<Contract>;
-    readonly functionName: "get_reserves" | "k_last" | "token_0" | "token_1";
-    readonly server: Readonly<SorobanRpc.Server>;
-}
 
 const transactionTimeout = 30;
 
-const callContract = async <SomePoolData>({
-    contract,
-    functionName,
-    server,
-}: Readonly<CallContractParameters>): Promise<SomePoolData> => {
+const callContract = async <SomePoolData>(
+    poolAddress: string,
+    functionName: "get_reserves" | "k_last" | "token_0" | "token_1",
+): Promise<SomePoolData> => {
+    const contract = new Contract(poolAddress);
+    const server = new SorobanRpc.Server(getEnvironmentVariable("SOROBAN_RPC_SERVER"));
+
     // We always need to fetch the source account, to make sure we have the
     // latest sequence number.
     const publicKey = Keypair.fromSecret(getEnvironmentVariable("PRIVATE_KEY")).publicKey();
@@ -54,19 +50,14 @@ const callContract = async <SomePoolData>({
     return scValToNative(xdr.ScVal.fromXDR(firstResult.xdr, "base64")) as SomePoolData;
 };
 
-const setVariables = (address: string) => ({
-    baseArguments: {
-        contract: new Contract(address),
-        server: new SorobanRpc.Server(getEnvironmentVariable("SOROBAN_RPC_SERVER")),
-    },
+const getAssetData = async (
+    poolAddress: string,
+    functionName: "token_0" | "token_1",
+): Promise<Asset> => {
+    const assetAddress = await callContract<string>(poolAddress, functionName);
 
-    poolData: { poolContract: address } as PoolData,
-
-    testnetPlaceholderData: {
-        domain: "placeholder domain",
-        org: "placeholder org",
-    },
-});
+    return await readAssetData(assetAddress);
+};
 
 /**
  * Retrieves the total number of liquidity pools from the Soroswap Factory
@@ -151,47 +142,16 @@ export const getLiquidityPoolAddresses = async (): Promise<string[]> => {
 /**
  * Retrieves data about a liquidity pool.
  *
- * @param address The address of the liquidity pool.
+ * @param poolAddress The address of the liquidity pool.
  * @returns A promise that resolves to the data about the liquidity pool.
  * @throws If any contract call fails or if asset data cannot be retrieved.
  */
-export const getLiquidityPoolData = async (address: string): Promise<PoolData> => {
-    const { baseArguments, poolData, testnetPlaceholderData } = setVariables(address);
-
+export const getLiquidityPoolData = async (poolAddress: string): Promise<PoolData> => ({
     // We call Soroban functions on the contract to populate the pool data.
-    poolData.reserves = await callContract<[number, number]>({
-        ...baseArguments,
-        functionName: "get_reserves",
-    });
-
-    poolData.constantProductOfReserves = await callContract({
-        ...baseArguments,
-        functionName: "k_last",
-    });
-
-    const firstTokenAddress = await callContract<string>({
-        ...baseArguments,
-        functionName: "token_0",
-    });
-
-    // The functions only give us the addresses, which we use to fetch the
-    // asset data.
-    const firstTokenData = await getAssetData(firstTokenAddress);
-
-    poolData.firstToken = firstTokenData
-        ? { ...testnetPlaceholderData, ...firstTokenData }
-        : firstTokenData;
-
-    const secondTokenAddress = await callContract<string>({
-        ...baseArguments,
-        functionName: "token_1",
-    });
-
-    const secondTokenData = await getAssetData(secondTokenAddress);
-
-    poolData.secondToken = secondTokenData
-        ? { ...testnetPlaceholderData, ...secondTokenData }
-        : secondTokenData;
-
-    return poolData;
-};
+    // Then we try to get more detailed data about the tokens.
+    constantProductOfReserves: await callContract<number>(poolAddress, "k_last"),
+    firstToken: await getAssetData(poolAddress, "token_0"),
+    poolContract: poolAddress,
+    reserves: await callContract<[number, number]>(poolAddress, "get_reserves"),
+    secondToken: await getAssetData(poolAddress, "token_1"),
+});

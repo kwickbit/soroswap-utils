@@ -1,7 +1,7 @@
 export type {
+    Asset,
     AssetData,
     CacheEntry,
-    DetailedAsset,
     MainnetResponse,
     PoolData,
     SimpleAsset,
@@ -10,4 +10,12 @@ export type {
     TestnetResponse,
 } from "./assets";
 export type { SoroswapContract } from "./contracts";
-export type { Asset, FactoryNewPairEvent } from "./events";
+export type {
+    FactoryEvent,
+    FactoryFeeDestinationAddressChangedEvent,
+    FactoryFeesEnabledEvent,
+    FactoryFeeSettingAddressChangedEvent,
+    FactoryInitializedEvent,
+    FactoryNewPairEvent,
+    RawFactoryEvent,
+} from "./factory-events";

@@ -8,7 +8,7 @@
     "docs:serve": "bunx serve docs",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts",
     "lint:fix": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts --fix",
-    "mainnet:example": "dotenvx run -f ../.env -f .env.production.local -- bun run src/example.ts",
+    "mainnet:example": "dotenvx run -f .env.production.local -- bun run src/example.ts",
     "prepare": "husky",
     "test": "dotenvx run -f ../.env -f .env.test.local -- jest",
     "testnet:example": "dotenvx run -f ../.env -f .env.test.local -- bun run src/example.ts",

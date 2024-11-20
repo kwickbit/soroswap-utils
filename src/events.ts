@@ -2,7 +2,7 @@
 import { getContractEventsParser } from "mercury-sdk";
 
 import { parseFactoryEvent } from "./event_parsers/factory";
-import type { SoroswapContract } from "./types";
+import type { RawFactoryEvent, SoroswapContract } from "./types";
 import { buildMercuryInstance, getEnvironmentVariable } from "./utils";
 
 const fetchSoroswapEvents = async (
@@ -27,14 +27,26 @@ const fetchSoroswapEvents = async (
 };
 
 /**
- * Retrieve Soroswap Factory contract events.
+ * Retrieve Soroswap Factory contract events. They are returned in chronological
+ * order.
  * @returns A promise that resolves to the event array.
  * @throws If the events cannot be read.
  */
-export const getSoroswapFactoryEvents = async (): Promise<unknown> => {
-    const rawEvents = (await fetchSoroswapEvents("SOROSWAP_FACTORY_CONTRACT", true)) as {
-        [key: string]: unknown;
-    }[];
+export const getSoroswapFactoryEvents = async ({
+    shouldReturnRawEvents = false,
+}): Promise<unknown> => {
+    const rawEvents = (await fetchSoroswapEvents(
+        "SOROSWAP_FACTORY_CONTRACT",
+        true,
+    )) as RawFactoryEvent[];
+
+    // Notice that `reverse` mutates the array in place. `toReversed` would be
+    // preferrable, but it is not supported everywhere.
+    rawEvents.reverse();
+
+    if (shouldReturnRawEvents) {
+        return rawEvents;
+    }
 
     return await Promise.all(rawEvents.map(parseFactoryEvent));
 };
@@ -90,7 +102,7 @@ export const doStringContractType = (
         !subscriptions.includes("factory")
     ) {
         return {
-            promises: [...promises, getSoroswapFactoryEvents()],
+            promises: [...promises, getSoroswapFactoryEvents({ shouldReturnRawEvents: false })],
             subscriptions: [...subscriptions, "factory"],
         };
     }

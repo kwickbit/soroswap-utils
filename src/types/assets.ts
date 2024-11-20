@@ -1,7 +1,13 @@
+interface UncertifiedAsset {
+    readonly contract: string;
+    readonly isSoroswapCertified: false;
+}
+
 // We give the user the option to get the data in a simpler format.
 interface SimpleAsset {
     readonly code: string;
     readonly contract: string;
+    readonly isSoroswapCertified: boolean;
     readonly issuer: string;
 }
 
@@ -15,6 +21,8 @@ interface DetailedAsset extends TestnetAsset {
     readonly domain: string;
     readonly org: string;
 }
+
+type Asset = DetailedAsset | TestnetAsset | UncertifiedAsset;
 
 interface TestnetData {
     readonly assets: readonly TestnetAsset[];
@@ -42,16 +50,16 @@ interface CacheEntry {
 
 interface PoolData {
     constantProductOfReserves: number;
-    firstToken?: DetailedAsset;
+    firstToken: Asset;
     readonly poolContract: string;
     reserves: readonly [number, number];
-    secondToken?: DetailedAsset;
+    secondToken: Asset;
 }
 
 export type {
+    Asset,
     AssetData,
     CacheEntry,
-    DetailedAsset,
     MainnetResponse,
     PoolData,
     SimpleAsset,

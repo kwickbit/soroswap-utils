@@ -38,7 +38,8 @@ describe("listCertifiedAssets", () => {
         expect(assets).not.toHaveLength(0);
 
         assets.forEach((asset: Readonly<SimpleAsset>) => {
-            expect(Object.keys(asset)).toHaveLength(3);
+            // Code, contract, issuer, and isSoroswapCertified
+            expect(Object.keys(asset)).toHaveLength(4);
 
             expect(asset.code).toStrictEqual(expect.any(String));
 

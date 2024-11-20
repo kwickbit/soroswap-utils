@@ -3,12 +3,11 @@ import { homedir } from "node:os";
 import { join } from "node:path";
 
 import type {
+    Asset,
     AssetData,
     CacheEntry,
-    DetailedAsset,
     MainnetResponse,
     SimpleAsset,
-    TestnetAsset,
     TestnetData,
     TestnetResponse,
 } from "./types";
@@ -46,13 +45,19 @@ const extractTestnetData = (data: TestnetResponse): TestnetData =>
 // Besides fetching fresh data, we also overwrite the cache file.
 //
 const fetchAssets = async (): Promise<AssetData> => {
-    // The env var is the same regardless of the network; the command line
-    // sets the correct one.
+    // The env var name is the same regardless of the network; the command line
+    // sets the correct environment.
     const response = await fetch(getEnvironmentVariable("SOROSWAP_ASSETS_URL"));
     const dataFromResponse = (await response.json()) as MainnetResponse | TestnetResponse;
     const data = isTestnet
         ? extractTestnetData(dataFromResponse as TestnetResponse)
         : (dataFromResponse as MainnetResponse);
+
+    // We will consider as certified only the mainnet assets.
+    const certifiedData = {
+        ...data,
+        assets: data.assets.map((asset) => ({ ...asset, isSoroswapCertified: !isTestnet })),
+    };
 
     await writeFile(
         isTestnet ? testnetCacheFile : mainnetCacheFile,
@@ -60,7 +65,7 @@ const fetchAssets = async (): Promise<AssetData> => {
         // Rule disabled because neither I nor Claude AI are smart enough to
         // figure out how to make this work.
         // eslint-disable-next-line total-functions/no-unsafe-readonly-mutable-assignment
-        JSON.stringify({ data, timestamp: Date.now() }),
+        JSON.stringify({ data: certifiedData, timestamp: Date.now() }),
     );
 
     return data;
@@ -92,7 +97,12 @@ const getCachedOrFetch = async (): Promise<AssetData> => {
 };
 
 const simplifyAssets = (data: AssetData): { assets: SimpleAsset[] } => ({
-    assets: data.assets.map(({ code, contract, issuer }) => ({ code, contract, issuer })),
+    assets: data.assets.map(({ code, contract, isSoroswapCertified, issuer }) => ({
+        code,
+        contract,
+        isSoroswapCertified,
+        issuer,
+    })),
 });
 
 /**
@@ -139,20 +149,18 @@ export const isCertifiedAsset = async (code: string, contract: string): Promise<
 /**
  * Retrieves data about an asset.
  *
- * @param address The address of the asset.
+ * @param contract The address of the asset's contract.
  * @returns A promise that resolves to the data about the asset.
  * @throws If asset not found (in mainnet only)
  */
-export const getAssetData = async (
-    address: string,
-): Promise<DetailedAsset | TestnetAsset | undefined> => {
+export const getAssetData = async (contract: string): Promise<Asset> => {
     const soroswapAssets = await getCachedOrFetch();
-    const assetData = soroswapAssets.assets.find((asset) => asset.contract === address);
+    const assetData = soroswapAssets.assets.find((asset) => asset.contract === contract);
 
-    // On the testnet it seems possible to create pools with
-    // non-existent assets, so we let them pass through.
-    if (assetData === undefined && !isTestnet) {
-        throw new Error(`Asset from contract ${address} not found`);
+    // We have full data for a list of certified assets, but it is possible to
+    // have other tokens in pools, and those we don't have data for.
+    if (assetData === undefined) {
+        return { contract, isSoroswapCertified: false };
     }
 
     return assetData;
