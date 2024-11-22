@@ -5,6 +5,7 @@ import { parseFactoryEvent } from "./event_parsers/factory";
 import { parsePairEvent } from "./event_parsers/pair";
 import type {
     ExtendedPairEvent,
+    FactoryEvent,
     RawExtendedPairEvent,
     RawFactoryEvent,
     SoroswapContract,
@@ -40,7 +41,7 @@ const fetchSoroswapEvents = async (
  */
 export const getSoroswapFactoryEvents = async ({
     shouldReturnRawEvents = false,
-}): Promise<unknown> => {
+}): Promise<readonly (FactoryEvent | RawFactoryEvent)[]> => {
     const rawEvents = (await fetchSoroswapEvents(
         "SOROSWAP_FACTORY_CONTRACT",
         true,
