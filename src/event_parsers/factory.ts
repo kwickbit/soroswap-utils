@@ -65,9 +65,7 @@ const parseFactorySetterEvent = (
     timestamp: rawEvent.timestamp as number,
 });
 
-const parseFactoryEvent = async (
-    rawEvent: RawFactoryEvent,
-): Promise<FactoryEvent | Readonly<{ [key: string]: unknown }>> => {
+const parseFactoryEvent = async (rawEvent: RawFactoryEvent): Promise<FactoryEvent> => {
     switch (rawEvent.topic2) {
         case "fees": {
             return parseFactoryFeesEvent(rawEvent);

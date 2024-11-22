@@ -2,7 +2,13 @@
 import { getContractEventsParser } from "mercury-sdk";
 
 import { parseFactoryEvent } from "./event_parsers/factory";
-import type { RawFactoryEvent, SoroswapContract } from "./types";
+import { parsePairEvent } from "./event_parsers/pair";
+import type {
+    ExtendedPairEvent,
+    RawExtendedPairEvent,
+    RawFactoryEvent,
+    SoroswapContract,
+} from "./types";
 import { buildMercuryInstance, getEnvironmentVariable } from "./utils";
 
 const fetchSoroswapEvents = async (
@@ -66,10 +72,15 @@ export const getSoroswapRouterEvents = async (): Promise<unknown> =>
  * tagged with its contract ID.
  * @throws If the events cannot be read.
  */
-export const getSoroswapPairEvents = async (contractId: string): Promise<unknown> => {
-    const rawEvents = (await fetchSoroswapEvents(contractId)) as { [key: string]: unknown }[];
+export const getSoroswapPairEvents = async (
+    contractId: string,
+    options?: { readonly shouldReturnRawEvents?: boolean },
+): Promise<readonly (ExtendedPairEvent | RawExtendedPairEvent)[]> => {
+    const rawEvents = (await fetchSoroswapEvents(contractId)) as RawExtendedPairEvent[];
 
-    return rawEvents.map((event) => ({ ...event, contractId }));
+    return options?.shouldReturnRawEvents !== undefined && options.shouldReturnRawEvents
+        ? rawEvents
+        : await Promise.all(rawEvents.map(parsePairEvent));
 };
 
 /**

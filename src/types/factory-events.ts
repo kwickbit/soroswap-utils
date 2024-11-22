@@ -7,23 +7,22 @@
  */
 
 import type { Asset } from "./assets";
+import type { BaseEvent, BaseRawEvent, FactoryEventType } from "./events-common";
 
 /**
  * Input type to the factory event parser.
  */
-interface RawFactoryEvent {
+interface RawFactoryEvent extends BaseRawEvent {
     readonly [key: string]: unknown;
     readonly topic1: "SoroswapFactory";
-    readonly topic2: "new_pair" | "init" | "fee_to" | "setter" | "fees";
-}
-
-interface BaseEvent {
-    readonly ledger: number;
-    readonly timestamp: number;
+    readonly topic2: FactoryEventType;
+    readonly topic3: never;
+    readonly topic4: never;
 }
 
 interface BaseFactoryEvent extends BaseEvent {
     readonly contractType: "SoroswapFactory";
+    readonly eventType: FactoryEventType;
 }
 
 /**

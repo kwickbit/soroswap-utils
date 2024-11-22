@@ -19,3 +19,32 @@ export type {
     FactoryNewPairEvent,
     RawFactoryEvent,
 } from "./factory-events";
+export type {
+    ExtendedPairEvent,
+    PairDepositEvent,
+    PairProperEvent,
+    PairSkimEvent,
+    PairSwapEvent,
+    PairSyncEvent,
+    PairWithdrawEvent,
+    RawExtendedPairEvent,
+    RawPairDepositEvent,
+    RawPairProperEvent,
+    RawPairSkimEvent,
+    RawPairSwapEvent,
+    RawPairSyncEvent,
+    RawPairWithdrawEvent,
+} from "./pair-events";
+export type {
+    RawTokenAdminEvent,
+    RawTokenEvent,
+    TokenAdminEvent,
+    TokenApproveEvent,
+    TokenBurnEvent,
+    TokenClawbackEvent,
+    TokenEvent,
+    TokenMintEvent,
+    TokenSetAdminEvent,
+    TokenSetAuthorizedEvent,
+    TokenTransferEvent,
+} from "./token-events";
