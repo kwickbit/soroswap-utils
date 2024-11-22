@@ -11,7 +11,7 @@ export type {
 } from "./assets";
 export type { SoroswapContract } from "./contracts";
 export type { RawSoroswapEvent, SoroswapEvent } from "./event-unions";
-export type { BaseRawEvent, ContractType } from "./events-common";
+export type { BaseEvent, BaseRawEvent, ContractType } from "./events-common";
 export type {
     FactoryEvent,
     FactoryFeeDestinationAddressChangedEvent,
