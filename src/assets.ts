@@ -113,7 +113,7 @@ const simplifyAssets = (data: AssetData): { assets: SimpleAsset[] } => ({
  * @returns A promise that resolves to the list of certified assets.
  * @throws If assets cannot be fetched or cached.
  */
-export const listCertifiedAssets = async (
+const listCertifiedAssets = async (
     shouldReturnSimpleAssets = false,
 ): Promise<AssetData | { assets: SimpleAsset[] }> => {
     try {
@@ -133,7 +133,7 @@ export const listCertifiedAssets = async (
  * @param contract The address of the asset contract.
  * @returns A promise that resolves to true if the asset is certified.
  */
-export const isCertifiedAsset = async (code: string, contract: string): Promise<boolean> => {
+const isCertifiedAsset = async (code: string, contract: string): Promise<boolean> => {
     if (code === "XLM" && contract === "Native") {
         return true;
     }
@@ -153,7 +153,7 @@ export const isCertifiedAsset = async (code: string, contract: string): Promise<
  * @returns A promise that resolves to the data about the asset.
  * @throws If asset not found (in mainnet only)
  */
-export const getAssetData = async (contract: string): Promise<Asset> => {
+const getAssetData = async (contract: string): Promise<Asset> => {
     const soroswapAssets = await getCachedOrFetch();
     const assetData = soroswapAssets.assets.find((asset) => asset.contract === contract);
 
@@ -165,3 +165,5 @@ export const getAssetData = async (contract: string): Promise<Asset> => {
 
     return assetData;
 };
+
+export { getAssetData, isCertifiedAsset, listCertifiedAssets };

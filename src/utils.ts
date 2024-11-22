@@ -8,7 +8,7 @@ import { Mercury } from "mercury-sdk";
  * @returns The input string, if it is valid.
  * @throws If the input string is empty or not even a string.
  */
-export const validateString = (value: unknown, errorMessage: string): string => {
+const validateString = (value: unknown, errorMessage: string): string => {
     if (typeof value !== "string" || value.length === 0) {
         throw new Error(errorMessage);
     } else {
@@ -22,7 +22,7 @@ export const validateString = (value: unknown, errorMessage: string): string => 
  * @returns The value of the environment variable.
  * @throws If the environment variable is not defined.
  */
-export const getEnvironmentVariable = (name: string): string => {
+const getEnvironmentVariable = (name: string): string => {
     const {
         env: { [name]: value },
     } = process;
@@ -35,7 +35,7 @@ export const getEnvironmentVariable = (name: string): string => {
  * their events.
  * @returns A Mercury instance.
  */
-export const buildMercuryInstance = (): Mercury => {
+const buildMercuryInstance = (): Mercury => {
     const mercuryArguments = {
         apiKey: getEnvironmentVariable("MERCURY_API_KEY"),
         backendEndpoint: getEnvironmentVariable("MERCURY_BACKEND_ENDPOINT"),
@@ -44,3 +44,5 @@ export const buildMercuryInstance = (): Mercury => {
 
     return new Mercury(mercuryArguments);
 };
+
+export { buildMercuryInstance, getEnvironmentVariable, validateString };

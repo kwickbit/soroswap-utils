@@ -66,7 +66,7 @@ const getAssetData = async (
  * @returns A promise that resolves to the total number of liquidity pools.
  * @throws If the contract data cannot be read.
  */
-export const getLiquidityPoolCount = async (): Promise<number> => {
+const getLiquidityPoolCount = async (): Promise<number> => {
     const { val: value } = await new SorobanRpc.Server(
         getEnvironmentVariable("SOROBAN_RPC_SERVER"),
     ).getContractData(
@@ -93,7 +93,7 @@ export const getLiquidityPoolCount = async (): Promise<number> => {
  *
  * @returns A promise that resolves to an array of liquidity pool addresses.
  */
-export const getLiquidityPoolAddresses = async (): Promise<string[]> => {
+const getLiquidityPoolAddresses = async (): Promise<string[]> => {
     const server = new SorobanRpc.Server(getEnvironmentVariable("SOROBAN_RPC_SERVER"));
     const contract = new Contract(getEnvironmentVariable("SOROSWAP_FACTORY_CONTRACT"));
     const sourceKeypair = Keypair.fromSecret(getEnvironmentVariable("PRIVATE_KEY"));
@@ -146,7 +146,7 @@ export const getLiquidityPoolAddresses = async (): Promise<string[]> => {
  * @returns A promise that resolves to the data about the liquidity pool.
  * @throws If any contract call fails or if asset data cannot be retrieved.
  */
-export const getLiquidityPoolData = async (poolAddress: string): Promise<PoolData> => ({
+const getLiquidityPoolData = async (poolAddress: string): Promise<PoolData> => ({
     // We call Soroban functions on the contract to populate the pool data.
     // Then we try to get more detailed data about the tokens.
     constantProductOfReserves: await callContract<number>(poolAddress, "k_last"),
@@ -155,3 +155,5 @@ export const getLiquidityPoolData = async (poolAddress: string): Promise<PoolDat
     reserves: await callContract<[number, number]>(poolAddress, "get_reserves"),
     secondToken: await getAssetData(poolAddress, "token_1"),
 });
+
+export { getLiquidityPoolAddresses, getLiquidityPoolCount, getLiquidityPoolData };

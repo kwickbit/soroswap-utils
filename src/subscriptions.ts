@@ -19,7 +19,7 @@ const soroswapSubscriber = async (
  * Use this function to subscribe to those events.
  * @returns A promise that resolves to true if the subscription was successful.
  */
-export const subscribeToSoroswapFactory = async (): Promise<boolean> =>
+const subscribeToSoroswapFactory = async (): Promise<boolean> =>
     await soroswapSubscriber("SOROSWAP_FACTORY_CONTRACT", true);
 
 /**
@@ -27,7 +27,7 @@ export const subscribeToSoroswapFactory = async (): Promise<boolean> =>
  * Use this function to subscribe to those events.
  * @returns A promise that resolves to true if the subscription was successful.
  */
-export const subscribeToSoroswapRouter = async (): Promise<boolean> =>
+const subscribeToSoroswapRouter = async (): Promise<boolean> =>
     await soroswapSubscriber("SOROSWAP_ROUTER_CONTRACT", true);
 
 /**
@@ -36,7 +36,7 @@ export const subscribeToSoroswapRouter = async (): Promise<boolean> =>
  * Use this function to subscribe to those events.
  * @returns A promise that resolves to true if the subscription was successful.
  */
-export const subscribeToSoroswapPair = async (pairContract: string): Promise<boolean> =>
+const subscribeToSoroswapPair = async (pairContract: string): Promise<boolean> =>
     await soroswapSubscriber(pairContract);
 
 /**
@@ -45,9 +45,7 @@ export const subscribeToSoroswapPair = async (pairContract: string): Promise<boo
  * @returns A promise that resolves to true if all subscriptions
  * were successful.
  */
-export const subscribeToSoroswapPairs = async (
-    contractIds: readonly string[],
-): Promise<boolean> => {
+const subscribeToSoroswapPairs = async (contractIds: readonly string[]): Promise<boolean> => {
     const promises = contractIds.map(
         async (pairContract) => await soroswapSubscriber(pairContract),
     );
@@ -55,10 +53,7 @@ export const subscribeToSoroswapPairs = async (
     return await Promise.all(promises).then((results) => results.every(Boolean));
 };
 
-// Rule disabled because this shouldn't be an export; it just needs to be after
-// the stuff it calls.
-// eslint-disable-next-line import/no-unused-modules
-export const doStringContractType = (
+const doStringContractType = (
     contractType: string,
     subscriptions: readonly string[],
     promises: readonly Readonly<Promise<boolean>>[],
@@ -83,10 +78,7 @@ export const doStringContractType = (
     throw new Error("Invalid contract type");
 };
 
-// Rule disabled because this shouldn't be an export; it just needs to be after
-// the stuff it calls.
-// eslint-disable-next-line import/no-unused-modules
-export const contractSubscriber = (
+const contractSubscriber = (
     {
         promises,
         subscriptions,
@@ -126,7 +118,7 @@ export const contractSubscriber = (
  * @returns A promise that resolves to true if all subscriptions
  * were successful.
  */
-export const subscribeToSoroswapContracts = async (
+const subscribeToSoroswapContracts = async (
     contractTypes: readonly SoroswapContract[],
 ): Promise<boolean> => {
     const { promises: returnedPromises } = contractTypes.reduce(contractSubscriber, {
@@ -135,4 +127,12 @@ export const subscribeToSoroswapContracts = async (
     });
 
     return await Promise.all(returnedPromises).then((results) => results.every(Boolean));
+};
+
+export {
+    subscribeToSoroswapContracts,
+    subscribeToSoroswapFactory,
+    subscribeToSoroswapPair,
+    subscribeToSoroswapPairs,
+    subscribeToSoroswapRouter,
 };
