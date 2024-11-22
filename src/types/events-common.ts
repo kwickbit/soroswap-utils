@@ -2,11 +2,18 @@ type FactoryEventType = "fees" | "fee_to" | "init" | "new_pair" | "setter";
 
 type PairEventType = "deposit" | "skim" | "swap" | "sync" | "withdraw";
 
+type RouterEventType = "add" | "init" | "remove" | "swap";
+
 type TokenAdminEventType = "clawback" | "mint" | "set_admin" | "set_authorized";
 
 type TokenEventType = "approve" | "burn" | "transfer";
 
-type EventType = FactoryEventType | PairEventType | TokenAdminEventType | TokenEventType;
+type EventType =
+    | FactoryEventType
+    | PairEventType
+    | RouterEventType
+    | TokenAdminEventType
+    | TokenEventType;
 
 type ContractType = "SoroswapFactory" | "SoroswapPair" | "SoroswapRouter" | "SorobanToken";
 
@@ -32,6 +39,7 @@ export type {
     ContractType,
     FactoryEventType,
     PairEventType,
+    RouterEventType,
     TokenAdminEventType,
     TokenEventType,
 };

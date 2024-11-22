@@ -3,16 +3,29 @@ import { getContractEventsParser } from "mercury-sdk";
 
 import { parseFactoryEvent } from "./event_parsers/factory";
 import { parsePairEvent } from "./event_parsers/pair";
+import { parseRouterEvent } from "./event_parsers/router";
 import type {
     ExtendedPairEvent,
     FactoryEvent,
     RawExtendedPairEvent,
     RawFactoryEvent,
+    RawRouterEvent,
     RawSoroswapEvent,
+    RouterEvent,
     SoroswapContract,
     SoroswapEvent,
 } from "./types";
 import { buildMercuryInstance, getEnvironmentVariable } from "./utils";
+
+interface EventGetterOptions {
+    readonly shouldReturnRawEvents: boolean;
+}
+
+interface FetcherState {
+    readonly options: EventGetterOptions;
+    readonly promises: readonly Promise<readonly (SoroswapEvent | RawSoroswapEvent)[]>[];
+    readonly subscriptions: readonly string[];
+}
 
 const fetchSoroswapEvents = async (
     contractId: string,
@@ -44,9 +57,9 @@ const fetchSoroswapEvents = async (
  * @returns A promise that resolves to the event array.
  * @throws If the events cannot be read.
  */
-const getSoroswapFactoryEvents = async (options?: {
-    readonly shouldReturnRawEvents?: boolean;
-}): Promise<readonly (FactoryEvent | RawFactoryEvent)[]> => {
+const getSoroswapFactoryEvents = async (
+    options?: EventGetterOptions,
+): Promise<readonly (FactoryEvent | RawFactoryEvent)[]> => {
     const rawEvents = (await fetchSoroswapEvents(
         "SOROSWAP_FACTORY_CONTRACT",
         true,
@@ -71,8 +84,20 @@ const getSoroswapFactoryEvents = async (options?: {
  * @returns A promise that resolves to the event array.
  * @throws If the events cannot be read.
  */
-const getSoroswapRouterEvents = async (): Promise<RawSoroswapEvent[]> =>
-    await fetchSoroswapEvents("SOROSWAP_ROUTER_CONTRACT", true);
+const getSoroswapRouterEvents = async (
+    options?: EventGetterOptions,
+): Promise<readonly (RouterEvent | RawRouterEvent)[]> => {
+    const rawEvents = (await fetchSoroswapEvents(
+        "SOROSWAP_ROUTER_CONTRACT",
+        true,
+    )) as RawRouterEvent[];
+
+    if (options?.shouldReturnRawEvents !== undefined && options.shouldReturnRawEvents) {
+        return rawEvents;
+    }
+
+    return await Promise.all(rawEvents.map(parseRouterEvent));
+};
 
 /**
  * Retrieve events from a given Soroswap Pair contract.
@@ -86,7 +111,7 @@ const getSoroswapRouterEvents = async (): Promise<RawSoroswapEvent[]> =>
  */
 const getSoroswapPairEvents = async (
     contractId: string,
-    options?: { readonly shouldReturnRawEvents?: boolean },
+    options?: EventGetterOptions,
 ): Promise<readonly (ExtendedPairEvent | RawExtendedPairEvent)[]> => {
     const rawEvents = (await fetchSoroswapEvents(contractId)) as RawExtendedPairEvent[];
     const rawEventsWithContractId = rawEvents.map((event) => ({ ...event, contractId }));
@@ -105,9 +130,10 @@ const getSoroswapPairEvents = async (
  */
 const getEventsFromSoroswapPairs = async (
     contractIds: readonly string[],
+    options?: EventGetterOptions,
 ): Promise<ExtendedPairEvent[]> => {
     const rawEvents = (await Promise.all(
-        contractIds.map(async (contractId) => await getSoroswapPairEvents(contractId)),
+        contractIds.map(async (contractId) => await getSoroswapPairEvents(contractId, options)),
     )) as ExtendedPairEvent[][];
 
     return rawEvents.flat();
@@ -115,22 +141,26 @@ const getEventsFromSoroswapPairs = async (
 
 const doStringContractType = (
     contractType: string,
+    promises: readonly Readonly<Promise<readonly (SoroswapEvent | RawSoroswapEvent)[]>>[],
     subscriptions: readonly string[],
-    promises: readonly Readonly<Promise<unknown>>[],
-): { promises: Promise<unknown>[]; subscriptions: string[] } => {
+    options: Readonly<EventGetterOptions>,
+    // eslint-disable-next-line @typescript-eslint/max-params
+): FetcherState => {
     if (
         ["factory", "SoroswapFactory"].includes(contractType) &&
         !subscriptions.includes("factory")
     ) {
         return {
-            promises: [...promises, getSoroswapFactoryEvents({ shouldReturnRawEvents: false })],
+            options,
+            promises: [...promises, getSoroswapFactoryEvents(options)],
             subscriptions: [...subscriptions, "factory"],
         };
     }
 
     if (["router", "SoroswapRouter"].includes(contractType) && !subscriptions.includes("router")) {
         return {
-            promises: [...promises, getSoroswapRouterEvents()],
+            options,
+            promises: [...promises, getSoroswapRouterEvents(options)],
             subscriptions: [...subscriptions, "router"],
         };
     }
@@ -140,23 +170,28 @@ const doStringContractType = (
 
 const eventFetcher = (
     {
+        options,
         promises,
         subscriptions,
     }: Readonly<{
-        promises: readonly Readonly<Promise<unknown>>[];
-        subscriptions: readonly string[];
+        readonly options: Readonly<EventGetterOptions>;
+        readonly promises: readonly Readonly<
+            Promise<readonly (SoroswapEvent | RawSoroswapEvent)[]>
+        >[];
+        readonly subscriptions: readonly string[];
     }>,
     contractType: SoroswapContract,
-): { promises: Promise<unknown>[]; subscriptions: string[] } => {
+): FetcherState => {
     switch (typeof contractType) {
         case "string": {
-            return doStringContractType(contractType, subscriptions, promises);
+            return doStringContractType(contractType, promises, subscriptions, options);
         }
         case "object": {
             const pairsToFetchFrom = contractType.pair ?? contractType.SoroswapPair;
 
             return {
-                promises: [...promises, getEventsFromSoroswapPairs(pairsToFetchFrom)],
+                options,
+                promises: [...promises, getEventsFromSoroswapPairs(pairsToFetchFrom, options)],
                 subscriptions: [...subscriptions, ...pairsToFetchFrom],
             };
         }
@@ -175,15 +210,20 @@ const eventFetcher = (
  *  - the strings "SoroswapRouter" or "router"
  *  - an object with either the key "SoroswapPair" or just "pair" and the value
  *    an array of contract IDs to subscribe to.
+ * @param [options] Options for event retrieval
+ * @param {boolean} [options.shouldReturnRawEvents] If true, return events in
+ * a less structured format, closer to how they are returned by the chain.
  * @returns A promise that resolves to the flat event array.
  * @throws If the events cannot be read.
  */
 const getEventsFromSoroswapContracts = async (
     contractTypes: readonly SoroswapContract[],
-): Promise<SoroswapEvent[]> => {
-    const { promises: returnedPromises } = contractTypes.reduce(eventFetcher, {
-        promises: [] as Promise<SoroswapEvent>[],
-        subscriptions: [] as string[],
+    options?: Readonly<EventGetterOptions>,
+): Promise<readonly SoroswapEvent[]> => {
+    const { promises: returnedPromises } = contractTypes.reduce<FetcherState>(eventFetcher, {
+        options: options ?? { shouldReturnRawEvents: false },
+        promises: [],
+        subscriptions: [],
     });
 
     const rawEvents = (await Promise.all(returnedPromises)) as SoroswapEvent[][];

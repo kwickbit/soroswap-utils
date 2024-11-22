@@ -1,9 +1,11 @@
 import type {
     RawTokenAdminEvent,
     RawTokenEvent,
+    TokenAdminEvent,
     TokenApproveEvent,
     TokenBurnEvent,
     TokenClawbackEvent,
+    TokenEvent,
     TokenMintEvent,
     TokenSetAdminEvent,
     TokenSetAuthorizedEvent,
@@ -86,12 +88,39 @@ const parseTokenTransferEvent = (rawEvent: RawTokenEvent): TokenTransferEvent =>
     timestamp: rawEvent.timestamp,
 });
 
-export {
-    parseTokenApproveEvent,
-    parseTokenBurnEvent,
-    parseTokenClawbackEvent,
-    parseTokenMintEvent,
-    parseTokenSetAdminEvent,
-    parseTokenSetAuthorizedEvent,
-    parseTokenTransferEvent,
+const parseSorobanTokenEvent = (
+    rawEvent: RawTokenEvent | RawTokenAdminEvent,
+): TokenEvent | TokenAdminEvent => {
+    // These are emitted by SoroswapPair contracts but their shape is determined
+    // by the SorobanToken interface, with topic1 as the event type.
+    switch (rawEvent.topic1) {
+        case "approve": {
+            return parseTokenApproveEvent(rawEvent);
+        }
+        case "burn": {
+            return parseTokenBurnEvent(rawEvent);
+        }
+        case "clawback": {
+            return parseTokenClawbackEvent(rawEvent);
+        }
+        case "mint": {
+            return parseTokenMintEvent(rawEvent);
+        }
+        case "set_admin": {
+            return parseTokenSetAdminEvent(rawEvent);
+        }
+        case "set_authorized": {
+            return parseTokenSetAuthorizedEvent(rawEvent);
+        }
+        case "transfer": {
+            return parseTokenTransferEvent(rawEvent);
+        }
+
+        default: {
+            // This should be unreachable, as the cases above are exhaustive.
+            throw new Error("Unknown token event type.");
+        }
+    }
 };
+
+export { parseSorobanTokenEvent };

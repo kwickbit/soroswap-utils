@@ -43,6 +43,17 @@ export type {
     RawPairWithdrawEvent,
 } from "./pair-events";
 export type {
+    RawRouterEvent,
+    RawRouterInitEvent,
+    RawRouterLiquidityEvent,
+    RawRouterSwapEvent,
+    RouterAddLiquidityEvent,
+    RouterEvent,
+    RouterInitializedEvent,
+    RouterRemoveLiquidityEvent,
+    RouterSwapEvent,
+} from "./router-events";
+export type {
     RawTokenAdminEvent,
     RawTokenEvent,
     TokenAdminEvent,
