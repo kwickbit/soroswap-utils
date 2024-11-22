@@ -8,7 +8,7 @@ type TokenEventType = "approve" | "burn" | "transfer";
 
 type EventType = FactoryEventType | PairEventType | TokenAdminEventType | TokenEventType;
 
-type SoroswapContract = "SoroswapFactory" | "SoroswapPair" | "SoroswapRouter" | "SorobanToken";
+type ContractType = "SoroswapFactory" | "SoroswapPair" | "SoroswapRouter" | "SorobanToken";
 
 interface BaseRawEvent {
     readonly ledger: number;
@@ -20,7 +20,7 @@ interface BaseRawEvent {
 }
 
 interface BaseEvent {
-    readonly contractType: SoroswapContract;
+    readonly contractType: ContractType;
     readonly eventType: EventType;
     readonly ledger: number;
     readonly timestamp: number;
@@ -29,6 +29,7 @@ interface BaseEvent {
 export type {
     BaseEvent,
     BaseRawEvent,
+    ContractType,
     FactoryEventType,
     PairEventType,
     TokenAdminEventType,

@@ -13,57 +13,48 @@ import type {
     RawFactoryNewPairEvent,
     RawFactorySetterEvent,
 } from "../types";
+import { parseCommonProperties } from "./common";
 
 const parseFactoryFeesEvent = (rawEvent: RawFactoryFeesEvent): FactoryFeesEnabledEvent => ({
+    ...parseCommonProperties(rawEvent, "SoroswapFactory"),
     areFeesEnabledNow: rawEvent.fees_enabled,
-    contractType: "SoroswapFactory",
     eventType: "fees",
-    ledger: rawEvent.ledger,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseFactoryFeeToEvent = (
     rawEvent: RawFactoryFeeToEvent,
 ): FactoryFeeDestinationAddressChangedEvent => ({
-    contractType: "SoroswapFactory",
+    ...parseCommonProperties(rawEvent, "SoroswapFactory"),
     eventType: "fee_to",
     feeSettingAddress: rawEvent.setter,
-    ledger: rawEvent.ledger,
     newFeeDestinationAddress: rawEvent.new,
     oldFeeDestinationAddress: rawEvent.old,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseFactoryInitEvent = (rawEvent: RawFactoryInitEvent): FactoryInitializedEvent => ({
-    contractType: "SoroswapFactory",
+    ...parseCommonProperties(rawEvent, "SoroswapFactory"),
     eventType: "init",
     feeSettingAddress: rawEvent.setter,
-    ledger: rawEvent.ledger,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseFactoryNewPairEvent = async (
     rawEvent: RawFactoryNewPairEvent,
 ): Promise<FactoryNewPairEvent> => ({
-    contractType: "SoroswapFactory",
+    ...parseCommonProperties(rawEvent, "SoroswapFactory"),
     eventType: "new_pair",
     firstToken: await getAssetData(rawEvent.token_0),
-    ledger: rawEvent.ledger,
     pairAddress: rawEvent.pair,
     pairIndex: rawEvent.new_pairs_length,
     secondToken: await getAssetData(rawEvent.token_1),
-    timestamp: rawEvent.timestamp,
 });
 
 const parseFactorySetterEvent = (
     rawEvent: RawFactorySetterEvent,
 ): FactoryFeeSettingAddressChangedEvent => ({
-    contractType: "SoroswapFactory",
+    ...parseCommonProperties(rawEvent, "SoroswapFactory"),
     eventType: "setter",
-    ledger: rawEvent.ledger,
     newfeeSettingAddress: rawEvent.new,
     oldfeeSettingAddress: rawEvent.old,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseFactoryEvent = async (rawEvent: RawFactoryEvent): Promise<FactoryEvent> => {

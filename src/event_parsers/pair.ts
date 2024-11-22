@@ -18,6 +18,7 @@ import type {
     TokenAdminEvent,
     TokenEvent,
 } from "../types";
+import { parsePairProperties } from "./common";
 import {
     parseTokenApproveEvent,
     parseTokenBurnEvent,
@@ -29,64 +30,49 @@ import {
 } from "./token";
 
 const parsePairDepositEvent = (rawEvent: RawPairDepositEvent): PairDepositEvent => ({
+    ...parsePairProperties(rawEvent, "SoroswapPair"),
     amountOfFirstTokenDeposited: BigInt(rawEvent.amount_0),
     amountOfSecondTokenDeposited: BigInt(rawEvent.amount_1),
-    contractId: rawEvent.contractId,
-    contractType: "SoroswapPair",
     eventType: "deposit",
-    ledger: rawEvent.ledger,
     liquidityPoolTokensMinted: BigInt(rawEvent.liquidity),
     newReserveOfFirstToken: BigInt(rawEvent.new_reserve_0),
     newReserveOfSecondToken: BigInt(rawEvent.new_reserve_1),
     recipientAddress: rawEvent.to,
-    timestamp: rawEvent.timestamp,
 });
 
 const parsePairSwapEvent = (rawEvent: RawPairSwapEvent): PairSwapEvent => ({
+    ...parsePairProperties(rawEvent, "SoroswapPair"),
     amountOfFirstTokenIncoming: BigInt(rawEvent.amount_0_in),
     amountOfFirstTokenOutgoing: BigInt(rawEvent.amount_0_out),
     amountOfSecondTokenIncoming: BigInt(rawEvent.amount_1_in),
     amountOfSecondTokenOutgoing: BigInt(rawEvent.amount_1_out),
-    contractId: rawEvent.contractId,
-    contractType: "SoroswapPair",
     eventType: "swap",
-    ledger: rawEvent.ledger,
     recipientAddress: rawEvent.to,
-    timestamp: rawEvent.timestamp,
 });
 
 const parsePairSyncEvent = (rawEvent: RawPairSyncEvent): PairSyncEvent => ({
-    contractId: rawEvent.contractId,
-    contractType: "SoroswapPair",
+    ...parsePairProperties(rawEvent, "SoroswapPair"),
     eventType: "sync",
-    ledger: rawEvent.ledger,
     newReserveOfFirstToken: BigInt(rawEvent.new_reserve_0),
     newReserveOfSecondToken: BigInt(rawEvent.new_reserve_1),
-    timestamp: rawEvent.timestamp,
 });
 
 const parsePairSkimEvent = (rawEvent: RawPairSkimEvent): PairSkimEvent => ({
+    ...parsePairProperties(rawEvent, "SoroswapPair"),
     amountOfFirstTokenSkimmed: BigInt(rawEvent.skimmed_0),
     amountOfSecondTokenSkimmed: BigInt(rawEvent.skimmed_1),
-    contractId: rawEvent.contractId,
-    contractType: "SoroswapPair",
     eventType: "skim",
-    ledger: rawEvent.ledger,
-    timestamp: rawEvent.timestamp,
 });
 
 const parsePairWithdrawEvent = (rawEvent: RawPairWithdrawEvent): PairWithdrawEvent => ({
+    ...parsePairProperties(rawEvent, "SoroswapPair"),
     amountOfFirstTokenWithdrawn: BigInt(rawEvent.amount_0),
     amountOfSecondTokenWithdrawn: BigInt(rawEvent.amount_1),
-    contractId: rawEvent.contractId,
-    contractType: "SoroswapPair",
     eventType: "withdraw",
-    ledger: rawEvent.ledger,
     liquidityPoolTokensBurned: BigInt(rawEvent.liquidity),
     newReserveOfFirstToken: BigInt(rawEvent.new_reserve_0),
     newReserveOfSecondToken: BigInt(rawEvent.new_reserve_1),
     recipientAddress: rawEvent.to,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseSoroswapPairEvent = (rawEvent: RawPairProperEvent): PairProperEvent => {
