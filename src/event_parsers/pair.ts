@@ -1,10 +1,12 @@
 import type {
+    ExtendedPairEvent,
     PairDepositEvent,
     PairProperEvent,
     PairSkimEvent,
     PairSwapEvent,
     PairSyncEvent,
     PairWithdrawEvent,
+    RawExtendedPairEvent,
     RawPairDepositEvent,
     RawPairProperEvent,
     RawPairSkimEvent,
@@ -29,6 +31,7 @@ import {
 const parsePairDepositEvent = (rawEvent: RawPairDepositEvent): PairDepositEvent => ({
     amountOfFirstTokenDeposited: BigInt(rawEvent.amount_0),
     amountOfSecondTokenDeposited: BigInt(rawEvent.amount_1),
+    contractId: rawEvent.contractId,
     contractType: "SoroswapPair",
     eventType: "deposit",
     ledger: rawEvent.ledger,
@@ -44,6 +47,7 @@ const parsePairSwapEvent = (rawEvent: RawPairSwapEvent): PairSwapEvent => ({
     amountOfFirstTokenOutgoing: BigInt(rawEvent.amount_0_out),
     amountOfSecondTokenIncoming: BigInt(rawEvent.amount_1_in),
     amountOfSecondTokenOutgoing: BigInt(rawEvent.amount_1_out),
+    contractId: rawEvent.contractId,
     contractType: "SoroswapPair",
     eventType: "swap",
     ledger: rawEvent.ledger,
@@ -52,6 +56,7 @@ const parsePairSwapEvent = (rawEvent: RawPairSwapEvent): PairSwapEvent => ({
 });
 
 const parsePairSyncEvent = (rawEvent: RawPairSyncEvent): PairSyncEvent => ({
+    contractId: rawEvent.contractId,
     contractType: "SoroswapPair",
     eventType: "sync",
     ledger: rawEvent.ledger,
@@ -63,6 +68,7 @@ const parsePairSyncEvent = (rawEvent: RawPairSyncEvent): PairSyncEvent => ({
 const parsePairSkimEvent = (rawEvent: RawPairSkimEvent): PairSkimEvent => ({
     amountOfFirstTokenSkimmed: BigInt(rawEvent.skimmed_0),
     amountOfSecondTokenSkimmed: BigInt(rawEvent.skimmed_1),
+    contractId: rawEvent.contractId,
     contractType: "SoroswapPair",
     eventType: "skim",
     ledger: rawEvent.ledger,
@@ -72,6 +78,7 @@ const parsePairSkimEvent = (rawEvent: RawPairSkimEvent): PairSkimEvent => ({
 const parsePairWithdrawEvent = (rawEvent: RawPairWithdrawEvent): PairWithdrawEvent => ({
     amountOfFirstTokenWithdrawn: BigInt(rawEvent.amount_0),
     amountOfSecondTokenWithdrawn: BigInt(rawEvent.amount_1),
+    contractId: rawEvent.contractId,
     contractType: "SoroswapPair",
     eventType: "withdraw",
     ledger: rawEvent.ledger,
@@ -143,9 +150,7 @@ const parseSorobanTokenEvent = (
     }
 };
 
-const parsePairEvent = (
-    rawEvent: RawPairProperEvent | RawTokenEvent | RawTokenAdminEvent,
-): PairProperEvent | TokenEvent | TokenAdminEvent => {
+const parsePairEvent = (rawEvent: RawExtendedPairEvent): ExtendedPairEvent => {
     if (rawEvent.topic1 === "SoroswapPair") {
         return parseSoroswapPairEvent(rawEvent);
     }

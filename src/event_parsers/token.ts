@@ -12,6 +12,7 @@ import type {
 
 const parseTokenApproveEvent = (rawEvent: RawTokenEvent): TokenApproveEvent => ({
     amount: BigInt(rawEvent.value),
+    contractId: rawEvent.contractId,
     contractType: "SorobanToken",
     eventType: "approve",
     expirationLedger: Number(rawEvent.value),
@@ -23,6 +24,7 @@ const parseTokenApproveEvent = (rawEvent: RawTokenEvent): TokenApproveEvent => (
 
 const parseTokenBurnEvent = (rawEvent: RawTokenEvent): TokenBurnEvent => ({
     amount: BigInt(rawEvent.value),
+    contractId: rawEvent.contractId,
     contractType: "SorobanToken",
     eventType: "burn",
     ledger: rawEvent.ledger,
@@ -33,6 +35,7 @@ const parseTokenBurnEvent = (rawEvent: RawTokenEvent): TokenBurnEvent => ({
 const parseTokenClawbackEvent = (rawEvent: RawTokenAdminEvent): TokenClawbackEvent => ({
     adminAddress: rawEvent.topic2,
     amount: BigInt(rawEvent.value),
+    contractId: rawEvent.contractId,
     contractType: "SorobanToken",
     eventType: "clawback",
     ledger: rawEvent.ledger,
@@ -43,6 +46,7 @@ const parseTokenClawbackEvent = (rawEvent: RawTokenAdminEvent): TokenClawbackEve
 const parseTokenMintEvent = (rawEvent: RawTokenAdminEvent): TokenMintEvent => ({
     adminAddress: rawEvent.topic2,
     amount: BigInt(rawEvent.value),
+    contractId: rawEvent.contractId,
     contractType: "SorobanToken",
     eventType: "mint",
     ledger: rawEvent.ledger,
@@ -52,6 +56,7 @@ const parseTokenMintEvent = (rawEvent: RawTokenAdminEvent): TokenMintEvent => ({
 
 const parseTokenSetAdminEvent = (rawEvent: RawTokenAdminEvent): TokenSetAdminEvent => ({
     adminAddress: rawEvent.topic2,
+    contractId: rawEvent.contractId,
     contractType: "SorobanToken",
     eventType: "set_admin",
     ledger: rawEvent.ledger,
@@ -61,6 +66,7 @@ const parseTokenSetAdminEvent = (rawEvent: RawTokenAdminEvent): TokenSetAdminEve
 
 const parseTokenSetAuthorizedEvent = (rawEvent: RawTokenAdminEvent): TokenSetAuthorizedEvent => ({
     adminAddress: rawEvent.topic2,
+    contractId: rawEvent.contractId,
     contractType: "SorobanToken",
     eventType: "set_authorized",
     isAuthorized: Boolean(rawEvent.value),
@@ -71,6 +77,7 @@ const parseTokenSetAuthorizedEvent = (rawEvent: RawTokenAdminEvent): TokenSetAut
 
 const parseTokenTransferEvent = (rawEvent: RawTokenEvent): TokenTransferEvent => ({
     amount: BigInt(rawEvent.value),
+    contractId: rawEvent.contractId,
     contractType: "SorobanToken",
     eventType: "transfer",
     ledger: rawEvent.ledger,

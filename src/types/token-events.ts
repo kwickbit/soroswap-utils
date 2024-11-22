@@ -1,6 +1,7 @@
 import type { BaseEvent, BaseRawEvent, TokenAdminEventType, TokenEventType } from "./events-common";
 
 interface RawTokenEvent extends BaseRawEvent {
+    readonly contractId: string;
     readonly topic1: TokenEventType;
     readonly topic2: string;
     readonly topic3: string;
@@ -8,15 +9,8 @@ interface RawTokenEvent extends BaseRawEvent {
     readonly value: string;
 }
 
-interface RawTokenAdminEvent extends BaseRawEvent {
-    readonly topic1: TokenAdminEventType;
-    readonly topic2: string;
-    readonly topic3: string;
-    readonly topic4: string;
-    readonly value: string;
-}
-
 interface BaseTokenEvent extends BaseEvent {
+    readonly contractId: string;
     readonly contractType: "SorobanToken";
     readonly eventType: TokenEventType;
 }
@@ -44,7 +38,17 @@ interface TokenTransferEvent extends BaseTokenEvent {
 
 type TokenEvent = TokenApproveEvent | TokenBurnEvent | TokenTransferEvent;
 
+interface RawTokenAdminEvent extends BaseRawEvent {
+    readonly contractId: string;
+    readonly topic1: TokenAdminEventType;
+    readonly topic2: string;
+    readonly topic3: string;
+    readonly topic4: string;
+    readonly value: string;
+}
+
 interface BaseTokenAdminEvent extends BaseEvent {
+    readonly contractId: string;
     readonly contractType: "SorobanToken";
     readonly eventType: TokenAdminEventType;
 }

@@ -77,10 +77,11 @@ export const getSoroswapPairEvents = async (
     options?: { readonly shouldReturnRawEvents?: boolean },
 ): Promise<readonly (ExtendedPairEvent | RawExtendedPairEvent)[]> => {
     const rawEvents = (await fetchSoroswapEvents(contractId)) as RawExtendedPairEvent[];
+    const rawEventsWithContractId = rawEvents.map((event) => ({ ...event, contractId }));
 
     return options?.shouldReturnRawEvents !== undefined && options.shouldReturnRawEvents
-        ? rawEvents
-        : await Promise.all(rawEvents.map(parsePairEvent));
+        ? rawEventsWithContractId
+        : await Promise.all(rawEventsWithContractId.map(parsePairEvent));
 };
 
 /**
@@ -92,10 +93,10 @@ export const getSoroswapPairEvents = async (
  */
 export const getEventsFromSoroswapPairs = async (
     contractIds: readonly string[],
-): Promise<unknown> => {
+): Promise<ExtendedPairEvent[]> => {
     const rawEvents = (await Promise.all(
         contractIds.map(async (contractId) => await getSoroswapPairEvents(contractId)),
-    )) as unknown[][];
+    )) as ExtendedPairEvent[][];
 
     return rawEvents.flat();
 };

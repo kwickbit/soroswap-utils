@@ -10,8 +10,11 @@ import type {
 } from "./token-events";
 
 interface BaseRawPairEvent extends BaseRawEvent {
+    readonly contractId: string;
     readonly topic1: "SoroswapPair";
     readonly topic2: PairEventType;
+    readonly topic3: never;
+    readonly topic4: never;
 }
 
 interface RawPairDepositEvent extends BaseRawPairEvent {
@@ -62,9 +65,10 @@ type RawPairProperEvent =
     | RawPairSyncEvent
     | RawPairWithdrawEvent;
 
-type RawExtendedPairEvent = RawPairProperEvent | RawTokenEvent | RawTokenAdminEvent;
+type RawExtendedPairEvent = RawPairProperEvent | RawTokenAdminEvent | RawTokenEvent;
 
 interface BasePairEvent extends BaseEvent {
+    readonly contractId: string;
     readonly contractType: "SoroswapPair";
     readonly eventType: PairEventType;
 }
@@ -117,7 +121,7 @@ type PairProperEvent =
     | PairSyncEvent
     | PairWithdrawEvent;
 
-type ExtendedPairEvent = PairProperEvent | TokenEvent | TokenAdminEvent;
+type ExtendedPairEvent = PairProperEvent | TokenAdminEvent | TokenEvent;
 
 export type {
     ExtendedPairEvent,
