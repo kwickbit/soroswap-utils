@@ -8,14 +8,16 @@ import type {
     FactoryEvent,
     RawExtendedPairEvent,
     RawFactoryEvent,
+    RawSoroswapEvent,
     SoroswapContract,
+    SoroswapEvent,
 } from "./types";
 import { buildMercuryInstance, getEnvironmentVariable } from "./utils";
 
 const fetchSoroswapEvents = async (
     contractId: string,
     isEnvironmentVariable = false,
-): Promise<unknown> => {
+): Promise<RawSoroswapEvent[]> => {
     const mercuryInstance = buildMercuryInstance();
 
     const soroswapEvents = await mercuryInstance.getContractEvents({
@@ -30,17 +32,20 @@ const fetchSoroswapEvents = async (
         throw new Error("No events found");
     }
 
-    return getContractEventsParser(soroswapEvents.data);
+    return getContractEventsParser(soroswapEvents.data) as RawSoroswapEvent[];
 };
 
 /**
  * Retrieve Soroswap Factory contract events. They are returned in chronological
  * order.
+ * @param [options] Options for event retrieval
+ * @param {boolean} [options.shouldReturnRawEvents] If true, return events in
+ * a less structured format, closer to how they are returned by the chain.
  * @returns A promise that resolves to the event array.
  * @throws If the events cannot be read.
  */
-export const getSoroswapFactoryEvents = async ({
-    shouldReturnRawEvents = false,
+const getSoroswapFactoryEvents = async (options?: {
+    readonly shouldReturnRawEvents?: boolean;
 }): Promise<readonly (FactoryEvent | RawFactoryEvent)[]> => {
     const rawEvents = (await fetchSoroswapEvents(
         "SOROSWAP_FACTORY_CONTRACT",
@@ -51,7 +56,7 @@ export const getSoroswapFactoryEvents = async ({
     // preferrable, but it is not supported everywhere.
     rawEvents.reverse();
 
-    if (shouldReturnRawEvents) {
+    if (options?.shouldReturnRawEvents !== undefined && options.shouldReturnRawEvents) {
         return rawEvents;
     }
 
@@ -60,20 +65,26 @@ export const getSoroswapFactoryEvents = async ({
 
 /**
  * Retrieve Soroswap Router contract events.
+ * @param [options] Options for event retrieval
+ * @param {boolean} [options.shouldReturnRawEvents] If true, return events in
+ * a less structured format, closer to how they are returned by the chain.
  * @returns A promise that resolves to the event array.
  * @throws If the events cannot be read.
  */
-export const getSoroswapRouterEvents = async (): Promise<unknown> =>
+const getSoroswapRouterEvents = async (): Promise<RawSoroswapEvent[]> =>
     await fetchSoroswapEvents("SOROSWAP_ROUTER_CONTRACT", true);
 
 /**
  * Retrieve events from a given Soroswap Pair contract.
  * @param contractId The contract ID of the Soroswap Pair contract.
+ * @param [options] Options for event retrieval
+ * @param {boolean} [options.shouldReturnRawEvents] If true, return events in
+ * a less structured format, closer to how they are returned by the chain.
  * @returns A promise that resolves to the event array,
  * tagged with its contract ID.
  * @throws If the events cannot be read.
  */
-export const getSoroswapPairEvents = async (
+const getSoroswapPairEvents = async (
     contractId: string,
     options?: { readonly shouldReturnRawEvents?: boolean },
 ): Promise<readonly (ExtendedPairEvent | RawExtendedPairEvent)[]> => {
@@ -92,7 +103,7 @@ export const getSoroswapPairEvents = async (
  * @returns A promise that resolves to the flat event array.
  * @throws If the events cannot be read.
  */
-export const getEventsFromSoroswapPairs = async (
+const getEventsFromSoroswapPairs = async (
     contractIds: readonly string[],
 ): Promise<ExtendedPairEvent[]> => {
     const rawEvents = (await Promise.all(
@@ -102,10 +113,7 @@ export const getEventsFromSoroswapPairs = async (
     return rawEvents.flat();
 };
 
-// Rule disabled because this shouldn't be an export; it just needs to be after
-// the stuff it calls.
-// eslint-disable-next-line import/no-unused-modules
-export const doStringContractType = (
+const doStringContractType = (
     contractType: string,
     subscriptions: readonly string[],
     promises: readonly Readonly<Promise<unknown>>[],
@@ -130,10 +138,7 @@ export const doStringContractType = (
     throw new Error("Invalid contract type");
 };
 
-// Rule disabled because this shouldn't be an export; it just needs to be after
-// the stuff it calls.
-// eslint-disable-next-line import/no-unused-modules
-export const eventFetcher = (
+const eventFetcher = (
     {
         promises,
         subscriptions,
@@ -173,15 +178,23 @@ export const eventFetcher = (
  * @returns A promise that resolves to the flat event array.
  * @throws If the events cannot be read.
  */
-export const getEventsFromSoroswapContracts = async (
+const getEventsFromSoroswapContracts = async (
     contractTypes: readonly SoroswapContract[],
-): Promise<unknown> => {
+): Promise<SoroswapEvent[]> => {
     const { promises: returnedPromises } = contractTypes.reduce(eventFetcher, {
-        promises: [] as Promise<unknown>[],
+        promises: [] as Promise<SoroswapEvent>[],
         subscriptions: [] as string[],
     });
 
-    const rawEvents = (await Promise.all(returnedPromises)) as unknown[][];
+    const rawEvents = (await Promise.all(returnedPromises)) as SoroswapEvent[][];
 
     return rawEvents.flat();
+};
+
+export {
+    getEventsFromSoroswapContracts,
+    getEventsFromSoroswapPairs,
+    getSoroswapFactoryEvents,
+    getSoroswapPairEvents,
+    getSoroswapRouterEvents,
 };
