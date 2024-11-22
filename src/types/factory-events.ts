@@ -6,19 +6,60 @@
  * - ledger and timestamp come from the chain itself
  */
 
+// We disable this rule because we don't control the names of the events coming
+// from the network.
+/* eslint-disable @typescript-eslint/naming-convention */
+
 import type { Asset } from "./assets";
 import type { BaseEvent, BaseRawEvent, FactoryEventType } from "./events-common";
 
 /**
  * Input type to the factory event parser.
  */
-interface RawFactoryEvent extends BaseRawEvent {
-    readonly [key: string]: unknown;
+interface BaseRawFactoryEvent extends BaseRawEvent {
     readonly topic1: "SoroswapFactory";
     readonly topic2: FactoryEventType;
     readonly topic3: never;
     readonly topic4: never;
 }
+
+interface RawFactoryFeesEvent extends BaseRawFactoryEvent {
+    readonly fees_enabled: boolean;
+    readonly topic2: "fees";
+}
+
+interface RawFactoryFeeToEvent extends BaseRawFactoryEvent {
+    readonly new: string;
+    readonly old: string;
+    readonly setter: string;
+    readonly topic2: "fee_to";
+}
+
+interface RawFactoryInitEvent extends BaseRawFactoryEvent {
+    readonly setter: string;
+    readonly topic2: "init";
+}
+
+interface RawFactoryNewPairEvent extends BaseRawFactoryEvent {
+    readonly new_pairs_length: number;
+    readonly pair: string;
+    readonly token_0: string;
+    readonly token_1: string;
+    readonly topic2: "new_pair";
+}
+
+interface RawFactorySetterEvent extends BaseRawFactoryEvent {
+    readonly new: string;
+    readonly old: string;
+    readonly topic2: "setter";
+}
+
+type RawFactoryEvent =
+    | RawFactoryFeesEvent
+    | RawFactoryFeeToEvent
+    | RawFactoryInitEvent
+    | RawFactoryNewPairEvent
+    | RawFactorySetterEvent;
 
 interface BaseFactoryEvent extends BaseEvent {
     readonly contractType: "SoroswapFactory";
@@ -100,6 +141,7 @@ type FactoryEvent =
     | FactoryNewPairEvent;
 
 export type {
+    BaseRawFactoryEvent,
     FactoryEvent,
     FactoryFeeDestinationAddressChangedEvent,
     FactoryFeesEnabledEvent,
@@ -107,4 +149,9 @@ export type {
     FactoryInitializedEvent,
     FactoryNewPairEvent,
     RawFactoryEvent,
+    RawFactoryFeesEvent,
+    RawFactoryFeeToEvent,
+    RawFactoryInitEvent,
+    RawFactoryNewPairEvent,
+    RawFactorySetterEvent,
 };

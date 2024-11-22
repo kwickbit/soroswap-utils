@@ -7,10 +7,15 @@ import type {
     FactoryInitializedEvent,
     FactoryNewPairEvent,
     RawFactoryEvent,
+    RawFactoryFeesEvent,
+    RawFactoryFeeToEvent,
+    RawFactoryInitEvent,
+    RawFactoryNewPairEvent,
+    RawFactorySetterEvent,
 } from "../types";
 
-const parseFactoryFeesEvent = (rawEvent: RawFactoryEvent): FactoryFeesEnabledEvent => ({
-    areFeesEnabledNow: rawEvent.fees_enabled as boolean,
+const parseFactoryFeesEvent = (rawEvent: RawFactoryFeesEvent): FactoryFeesEnabledEvent => ({
+    areFeesEnabledNow: rawEvent.fees_enabled,
     contractType: "SoroswapFactory",
     eventType: "fees",
     ledger: rawEvent.ledger,
@@ -18,46 +23,46 @@ const parseFactoryFeesEvent = (rawEvent: RawFactoryEvent): FactoryFeesEnabledEve
 });
 
 const parseFactoryFeeToEvent = (
-    rawEvent: RawFactoryEvent,
+    rawEvent: RawFactoryFeeToEvent,
 ): FactoryFeeDestinationAddressChangedEvent => ({
     contractType: "SoroswapFactory",
     eventType: "fee_to",
-    feeSettingAddress: rawEvent.setter as string,
+    feeSettingAddress: rawEvent.setter,
     ledger: rawEvent.ledger,
-    newFeeDestinationAddress: rawEvent.new as string,
-    oldFeeDestinationAddress: rawEvent.old as string,
+    newFeeDestinationAddress: rawEvent.new,
+    oldFeeDestinationAddress: rawEvent.old,
     timestamp: rawEvent.timestamp,
 });
 
-const parseFactoryInitEvent = (rawEvent: RawFactoryEvent): FactoryInitializedEvent => ({
+const parseFactoryInitEvent = (rawEvent: RawFactoryInitEvent): FactoryInitializedEvent => ({
     contractType: "SoroswapFactory",
     eventType: "init",
-    feeSettingAddress: rawEvent.setter as string,
+    feeSettingAddress: rawEvent.setter,
     ledger: rawEvent.ledger,
     timestamp: rawEvent.timestamp,
 });
 
 const parseFactoryNewPairEvent = async (
-    rawEvent: RawFactoryEvent,
+    rawEvent: RawFactoryNewPairEvent,
 ): Promise<FactoryNewPairEvent> => ({
     contractType: "SoroswapFactory",
     eventType: "new_pair",
-    firstToken: await getAssetData(rawEvent.token_0 as string),
+    firstToken: await getAssetData(rawEvent.token_0),
     ledger: rawEvent.ledger,
-    pairAddress: rawEvent.pair as string,
-    pairIndex: rawEvent.new_pairs_length as number,
-    secondToken: await getAssetData(rawEvent.token_1 as string),
+    pairAddress: rawEvent.pair,
+    pairIndex: rawEvent.new_pairs_length,
+    secondToken: await getAssetData(rawEvent.token_1),
     timestamp: rawEvent.timestamp,
 });
 
 const parseFactorySetterEvent = (
-    rawEvent: RawFactoryEvent,
+    rawEvent: RawFactorySetterEvent,
 ): FactoryFeeSettingAddressChangedEvent => ({
     contractType: "SoroswapFactory",
     eventType: "setter",
     ledger: rawEvent.ledger,
-    newfeeSettingAddress: rawEvent.new as string,
-    oldfeeSettingAddress: rawEvent.old as string,
+    newfeeSettingAddress: rawEvent.new,
+    oldfeeSettingAddress: rawEvent.old,
     timestamp: rawEvent.timestamp,
 });
 

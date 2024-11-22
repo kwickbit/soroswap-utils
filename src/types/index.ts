@@ -18,6 +18,11 @@ export type {
     FactoryInitializedEvent,
     FactoryNewPairEvent,
     RawFactoryEvent,
+    RawFactoryFeesEvent,
+    RawFactoryFeeToEvent,
+    RawFactoryInitEvent,
+    RawFactoryNewPairEvent,
+    RawFactorySetterEvent,
 } from "./factory-events";
 export type {
     ExtendedPairEvent,
