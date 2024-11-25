@@ -8,6 +8,8 @@ type TokenAdminEventType = "clawback" | "mint" | "set_admin" | "set_authorized";
 
 type TokenEventType = "approve" | "burn" | "transfer";
 
+type ExtendedTokenEventType = TokenEventType | TokenAdminEventType;
+
 type EventType =
     | FactoryEventType
     | PairEventType
@@ -37,6 +39,7 @@ export type {
     BaseEvent,
     BaseRawEvent,
     ContractType,
+    ExtendedTokenEventType,
     FactoryEventType,
     PairEventType,
     RouterEventType,

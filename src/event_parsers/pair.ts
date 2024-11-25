@@ -1,5 +1,6 @@
 import type {
     ExtendedPairEvent,
+    ExtendedTokenEventType,
     PairDepositEvent,
     PairProperEvent,
     PairSkimEvent,
@@ -97,9 +98,17 @@ const parsePairEvent = (rawEvent: RawExtendedPairEvent): ExtendedPairEvent => {
     }
 
     if (
-        ["approve", "burn", "clawback", "mint", "set_admin", "set_authorized", "transfer"].includes(
-            rawEvent.topic1,
-        )
+        (
+            [
+                "approve",
+                "burn",
+                "clawback",
+                "mint",
+                "set_admin",
+                "set_authorized",
+                "transfer",
+            ] as const satisfies readonly ExtendedTokenEventType[]
+        ).includes(rawEvent.topic1)
     ) {
         return parseSorobanTokenEvent(rawEvent);
     }
