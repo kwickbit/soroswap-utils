@@ -15,10 +15,9 @@ import { parseCommonProperties } from "./common";
 const parseRouterAddLiquidityEvent = async (
     rawEvent: RawRouterLiquidityEvent & { readonly topic2: "add" },
 ): Promise<RouterAddLiquidityEvent> => ({
-    ...parseCommonProperties(rawEvent, "SoroswapRouter"),
+    ...parseCommonProperties(rawEvent),
     amountOfFirstTokenDeposited: BigInt(rawEvent.amount_a),
     amountOfSecondTokenDeposited: BigInt(rawEvent.amount_b),
-    eventType: "add",
     firstToken: await getAssetData(rawEvent.token_a),
     liquidityPoolAddress: rawEvent.pair,
     liquidityPoolTokensMinted: BigInt(rawEvent.liquidity),
@@ -27,18 +26,16 @@ const parseRouterAddLiquidityEvent = async (
 });
 
 const parseRouterInitEvent = (rawEvent: RawRouterInitEvent): RouterInitializedEvent => ({
-    ...parseCommonProperties(rawEvent, "SoroswapRouter"),
-    eventType: "init",
+    ...parseCommonProperties(rawEvent),
     factoryAddress: rawEvent.factory,
 });
 
 const parseRouterRemoveLiquidityEvent = async (
     rawEvent: RawRouterLiquidityEvent & { readonly topic2: "remove" },
 ): Promise<RouterRemoveLiquidityEvent> => ({
-    ...parseCommonProperties(rawEvent, "SoroswapRouter"),
+    ...parseCommonProperties(rawEvent),
     amountOfFirstTokenWithdrawn: BigInt(rawEvent.amount_a),
     amountOfSecondTokenWithdrawn: BigInt(rawEvent.amount_b),
-    eventType: "remove",
     firstToken: await getAssetData(rawEvent.token_a),
     liquidityPoolAddress: rawEvent.pair,
     liquidityPoolTokensBurned: BigInt(rawEvent.liquidity),
@@ -47,8 +44,7 @@ const parseRouterRemoveLiquidityEvent = async (
 });
 
 const parseRouterSwapEvent = async (rawEvent: RawRouterSwapEvent): Promise<RouterSwapEvent> => ({
-    ...parseCommonProperties(rawEvent, "SoroswapRouter"),
-    eventType: "swap",
+    ...parseCommonProperties(rawEvent),
     recipientAddress: rawEvent.to,
     tokenAmountsInSequence: rawEvent.amounts.map(BigInt),
     tradedTokenSequence: await Promise.all(rawEvent.path.map(getAssetData)),

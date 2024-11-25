@@ -39,6 +39,7 @@ export type {
     BaseEvent,
     BaseRawEvent,
     ContractType,
+    EventType,
     ExtendedTokenEventType,
     FactoryEventType,
     PairEventType,

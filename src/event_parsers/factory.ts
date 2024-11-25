@@ -16,32 +16,28 @@ import type {
 import { parseCommonProperties } from "./common";
 
 const parseFactoryFeesEvent = (rawEvent: RawFactoryFeesEvent): FactoryFeesEnabledEvent => ({
-    ...parseCommonProperties(rawEvent, "SoroswapFactory"),
+    ...parseCommonProperties(rawEvent),
     areFeesEnabledNow: rawEvent.fees_enabled,
-    eventType: "fees",
 });
 
 const parseFactoryFeeToEvent = (
     rawEvent: RawFactoryFeeToEvent,
 ): FactoryFeeDestinationAddressChangedEvent => ({
-    ...parseCommonProperties(rawEvent, "SoroswapFactory"),
-    eventType: "fee_to",
+    ...parseCommonProperties(rawEvent),
     feeSettingAddress: rawEvent.setter,
     newFeeDestinationAddress: rawEvent.new,
     oldFeeDestinationAddress: rawEvent.old,
 });
 
 const parseFactoryInitEvent = (rawEvent: RawFactoryInitEvent): FactoryInitializedEvent => ({
-    ...parseCommonProperties(rawEvent, "SoroswapFactory"),
-    eventType: "init",
+    ...parseCommonProperties(rawEvent),
     feeSettingAddress: rawEvent.setter,
 });
 
 const parseFactoryNewPairEvent = async (
     rawEvent: RawFactoryNewPairEvent,
 ): Promise<FactoryNewPairEvent> => ({
-    ...parseCommonProperties(rawEvent, "SoroswapFactory"),
-    eventType: "new_pair",
+    ...parseCommonProperties(rawEvent),
     firstToken: await getAssetData(rawEvent.token_0),
     pairAddress: rawEvent.pair,
     pairIndex: rawEvent.new_pairs_length,
@@ -51,8 +47,7 @@ const parseFactoryNewPairEvent = async (
 const parseFactorySetterEvent = (
     rawEvent: RawFactorySetterEvent,
 ): FactoryFeeSettingAddressChangedEvent => ({
-    ...parseCommonProperties(rawEvent, "SoroswapFactory"),
-    eventType: "setter",
+    ...parseCommonProperties(rawEvent),
     newfeeSettingAddress: rawEvent.new,
     oldfeeSettingAddress: rawEvent.old,
 });

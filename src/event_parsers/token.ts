@@ -11,81 +11,54 @@ import type {
     TokenSetAuthorizedEvent,
     TokenTransferEvent,
 } from "../types";
+import { parseTokenProperties } from "./common";
 
 const parseTokenApproveEvent = (rawEvent: RawTokenEvent): TokenApproveEvent => ({
+    ...parseTokenProperties(rawEvent),
     amount: BigInt(rawEvent.value),
-    contractId: rawEvent.contractId,
-    contractType: "SorobanToken",
-    eventType: "approve",
     expirationLedger: Number(rawEvent.value),
-    ledger: rawEvent.ledger,
     ownerAddress: rawEvent.topic2,
     spenderAddress: rawEvent.topic3,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseTokenBurnEvent = (rawEvent: RawTokenEvent): TokenBurnEvent => ({
+    ...parseTokenProperties(rawEvent),
     amount: BigInt(rawEvent.value),
-    contractId: rawEvent.contractId,
-    contractType: "SorobanToken",
-    eventType: "burn",
-    ledger: rawEvent.ledger,
     ownerAddress: rawEvent.topic2,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseTokenClawbackEvent = (rawEvent: RawTokenAdminEvent): TokenClawbackEvent => ({
+    ...parseTokenProperties(rawEvent),
     adminAddress: rawEvent.topic2,
     amount: BigInt(rawEvent.value),
-    contractId: rawEvent.contractId,
-    contractType: "SorobanToken",
-    eventType: "clawback",
-    ledger: rawEvent.ledger,
     targetAddress: rawEvent.topic3,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseTokenMintEvent = (rawEvent: RawTokenAdminEvent): TokenMintEvent => ({
+    ...parseTokenProperties(rawEvent),
     adminAddress: rawEvent.topic2,
     amount: BigInt(rawEvent.value),
-    contractId: rawEvent.contractId,
-    contractType: "SorobanToken",
-    eventType: "mint",
-    ledger: rawEvent.ledger,
     recipientAddress: rawEvent.topic3,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseTokenSetAdminEvent = (rawEvent: RawTokenAdminEvent): TokenSetAdminEvent => ({
+    ...parseTokenProperties(rawEvent),
     adminAddress: rawEvent.topic2,
-    contractId: rawEvent.contractId,
-    contractType: "SorobanToken",
-    eventType: "set_admin",
-    ledger: rawEvent.ledger,
     newAdminAddress: rawEvent.value,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseTokenSetAuthorizedEvent = (rawEvent: RawTokenAdminEvent): TokenSetAuthorizedEvent => ({
+    ...parseTokenProperties(rawEvent),
     adminAddress: rawEvent.topic2,
-    contractId: rawEvent.contractId,
-    contractType: "SorobanToken",
-    eventType: "set_authorized",
     isAuthorized: Boolean(rawEvent.value),
-    ledger: rawEvent.ledger,
     targetAddress: rawEvent.topic3,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseTokenTransferEvent = (rawEvent: RawTokenEvent): TokenTransferEvent => ({
+    ...parseTokenProperties(rawEvent),
     amount: BigInt(rawEvent.value),
-    contractId: rawEvent.contractId,
-    contractType: "SorobanToken",
-    eventType: "transfer",
-    ledger: rawEvent.ledger,
     recipientAddress: rawEvent.topic3,
     senderAddress: rawEvent.topic2,
-    timestamp: rawEvent.timestamp,
 });
 
 const parseSorobanTokenEvent = (

@@ -15,6 +15,7 @@ export type {
     BaseEvent,
     BaseRawEvent,
     ContractType,
+    EventType,
     ExtendedTokenEventType,
 } from "./events-common";
 export type {

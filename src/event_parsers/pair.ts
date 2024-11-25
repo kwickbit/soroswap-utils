@@ -19,10 +19,9 @@ import { parsePairProperties } from "./common";
 import { parseSorobanTokenEvent } from "./token";
 
 const parsePairDepositEvent = (rawEvent: RawPairDepositEvent): PairDepositEvent => ({
-    ...parsePairProperties(rawEvent, "SoroswapPair"),
+    ...parsePairProperties(rawEvent),
     amountOfFirstTokenDeposited: BigInt(rawEvent.amount_0),
     amountOfSecondTokenDeposited: BigInt(rawEvent.amount_1),
-    eventType: "deposit",
     liquidityPoolTokensMinted: BigInt(rawEvent.liquidity),
     newReserveOfFirstToken: BigInt(rawEvent.new_reserve_0),
     newReserveOfSecondToken: BigInt(rawEvent.new_reserve_1),
@@ -30,34 +29,30 @@ const parsePairDepositEvent = (rawEvent: RawPairDepositEvent): PairDepositEvent 
 });
 
 const parsePairSwapEvent = (rawEvent: RawPairSwapEvent): PairSwapEvent => ({
-    ...parsePairProperties(rawEvent, "SoroswapPair"),
+    ...parsePairProperties(rawEvent),
     amountOfFirstTokenIncoming: BigInt(rawEvent.amount_0_in),
     amountOfFirstTokenOutgoing: BigInt(rawEvent.amount_0_out),
     amountOfSecondTokenIncoming: BigInt(rawEvent.amount_1_in),
     amountOfSecondTokenOutgoing: BigInt(rawEvent.amount_1_out),
-    eventType: "swap",
     recipientAddress: rawEvent.to,
 });
 
 const parsePairSyncEvent = (rawEvent: RawPairSyncEvent): PairSyncEvent => ({
-    ...parsePairProperties(rawEvent, "SoroswapPair"),
-    eventType: "sync",
+    ...parsePairProperties(rawEvent),
     newReserveOfFirstToken: BigInt(rawEvent.new_reserve_0),
     newReserveOfSecondToken: BigInt(rawEvent.new_reserve_1),
 });
 
 const parsePairSkimEvent = (rawEvent: RawPairSkimEvent): PairSkimEvent => ({
-    ...parsePairProperties(rawEvent, "SoroswapPair"),
+    ...parsePairProperties(rawEvent),
     amountOfFirstTokenSkimmed: BigInt(rawEvent.skimmed_0),
     amountOfSecondTokenSkimmed: BigInt(rawEvent.skimmed_1),
-    eventType: "skim",
 });
 
 const parsePairWithdrawEvent = (rawEvent: RawPairWithdrawEvent): PairWithdrawEvent => ({
-    ...parsePairProperties(rawEvent, "SoroswapPair"),
+    ...parsePairProperties(rawEvent),
     amountOfFirstTokenWithdrawn: BigInt(rawEvent.amount_0),
     amountOfSecondTokenWithdrawn: BigInt(rawEvent.amount_1),
-    eventType: "withdraw",
     liquidityPoolTokensBurned: BigInt(rawEvent.liquidity),
     newReserveOfFirstToken: BigInt(rawEvent.new_reserve_0),
     newReserveOfSecondToken: BigInt(rawEvent.new_reserve_1),
