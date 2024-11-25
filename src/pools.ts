@@ -16,31 +16,39 @@ import type { Asset, PoolData } from "./types";
 import { getEnvironmentVariable, validateString } from "./utils";
 
 const transactionTimeout = 30;
+const server = new SorobanRpc.Server(getEnvironmentVariable("SOROBAN_RPC_SERVER"));
 
-const callContract = async <SomePoolData>(
-    poolAddress: string,
-    functionName: "get_reserves" | "k_last" | "token_0" | "token_1",
-): Promise<SomePoolData> => {
-    const contract = new Contract(poolAddress);
-    const server = new SorobanRpc.Server(getEnvironmentVariable("SOROBAN_RPC_SERVER"));
+type SorobanFunctions = "all_pairs" | "get_reserves" | "k_last" | "token_0" | "token_1";
 
+const callSorobanFunction = async (
+    contractAddress: string,
+    sorobanFunctionName: SorobanFunctions,
+    sorobanFunctionArguments: Readonly<xdr.ScVal>,
+): Promise<SorobanRpc.Api.RawSimulateTransactionResponse> => {
     // We always need to fetch the source account, to make sure we have the
     // latest sequence number.
     const publicKey = Keypair.fromSecret(getEnvironmentVariable("PRIVATE_KEY")).publicKey();
     const sourceAccount = await server.getAccount(publicKey);
+    const contract = new Contract(contractAddress);
 
     const transaction = new TransactionBuilder(sourceAccount, {
         fee: BASE_FEE,
         networkPassphrase: Networks.TESTNET,
     })
-        .addOperation(contract.call(functionName))
+        .addOperation(contract.call(sorobanFunctionName, sorobanFunctionArguments))
         .setTimeout(transactionTimeout)
         .build();
 
     // Rule disabled because it refers to a dependency we cannot change.
     // eslint-disable-next-line no-underscore-dangle
-    const result = await server._simulateTransaction(transaction);
+    return await server._simulateTransaction(transaction);
+};
 
+const callPoolContract = async <SomePoolData>(
+    poolAddress: string,
+    sorobanFunctionName: "get_reserves" | "k_last" | "token_0" | "token_1",
+): Promise<SomePoolData> => {
+    const result = await callSorobanFunction(poolAddress, sorobanFunctionName, nativeToScVal([]));
     const firstResult = result.results?.[0];
 
     if (firstResult === undefined) {
@@ -54,7 +62,7 @@ const getAssetData = async (
     poolAddress: string,
     functionName: "token_0" | "token_1",
 ): Promise<Asset> => {
-    const assetAddress = await callContract<string>(poolAddress, functionName);
+    const assetAddress = await callPoolContract<string>(poolAddress, functionName);
 
     return await readAssetData(assetAddress);
 };
@@ -67,9 +75,7 @@ const getAssetData = async (
  * @throws If the contract data cannot be read.
  */
 const getLiquidityPoolCount = async (): Promise<number> => {
-    const { val: value } = await new SorobanRpc.Server(
-        getEnvironmentVariable("SOROBAN_RPC_SERVER"),
-    ).getContractData(
+    const { val: value } = await server.getContractData(
         getEnvironmentVariable("SOROSWAP_FACTORY_CONTRACT"),
         xdr.ScVal.scvLedgerKeyContractInstance(),
     );
@@ -86,6 +92,28 @@ const getLiquidityPoolCount = async (): Promise<number> => {
     return (scValToNative(xdr.ScVal.scvMap(storage)) as { TotalPairs: number }).TotalPairs;
 };
 
+const getLiquidityPoolAddress = async (index: number) => {
+    const liquidityPoolAddress = await callSorobanFunction(
+        getEnvironmentVariable("SOROSWAP_FACTORY_CONTRACT"),
+        "all_pairs",
+        nativeToScVal(index, { type: "u32" }),
+    );
+
+    if (!liquidityPoolAddress.results) {
+        return undefined;
+    }
+
+    const address = xdr.ScVal.fromXDR(
+        validateString(
+            liquidityPoolAddress.results[0]?.xdr,
+            "Invalid response: missing pool address",
+        ),
+        "base64",
+    );
+
+    return Address.fromScVal(address).toString();
+};
+
 /**
  * Retrieves all liquidity pool addresses from the Soroswap Factory contract.
  * Since there is no function to do that directly, this function fetches the
@@ -93,51 +121,14 @@ const getLiquidityPoolCount = async (): Promise<number> => {
  *
  * @returns A promise that resolves to an array of liquidity pool addresses.
  */
-const getLiquidityPoolAddresses = async (): Promise<string[]> => {
-    const server = new SorobanRpc.Server(getEnvironmentVariable("SOROBAN_RPC_SERVER"));
-    const contract = new Contract(getEnvironmentVariable("SOROSWAP_FACTORY_CONTRACT"));
-    const sourceKeypair = Keypair.fromSecret(getEnvironmentVariable("PRIVATE_KEY"));
-    const sourceAccount = await server.getAccount(sourceKeypair.publicKey());
-    const liquidityPoolCount = await getLiquidityPoolCount();
-
-    // Fetch one liquidity pool address
-    const fetchLiquidityPoolAddress = async (index: number) => {
-        const rawTransaction = new TransactionBuilder(sourceAccount, {
-            fee: BASE_FEE,
-            networkPassphrase: Networks.TESTNET,
-        })
-            .addOperation(contract.call("all_pairs", nativeToScVal(index, { type: "u32" })))
-            .setTimeout(transactionTimeout)
-            .build();
-
-        // Rule disabled because it refers to a dependency we cannot change.
-        // eslint-disable-next-line no-underscore-dangle
-        const getLiquidityPoolAddress = await server._simulateTransaction(rawTransaction);
-
-        if (!getLiquidityPoolAddress.results) {
-            return undefined;
-        }
-
-        const address = xdr.ScVal.fromXDR(
-            validateString(
-                getLiquidityPoolAddress.results[0]?.xdr,
-                "Invalid response: missing pool address",
-            ),
-            "base64",
-        );
-
-        return Address.fromScVal(address).toString();
-    };
-
-    // Fetch all addresses
-    return await Promise.all(
+const getLiquidityPoolAddresses = async (): Promise<string[]> =>
+    await Promise.all(
         Array.from(
-            { length: liquidityPoolCount },
+            { length: await getLiquidityPoolCount() },
             // eslint-disable-next-line no-underscore-dangle, @typescript-eslint/naming-convention
-            async (_unused, index) => await fetchLiquidityPoolAddress(index),
+            async (_unused, index) => await getLiquidityPoolAddress(index),
         ),
     ).then((results) => results.filter((address): address is string => address !== undefined));
-};
 
 /**
  * Retrieves data about a liquidity pool.
@@ -149,10 +140,10 @@ const getLiquidityPoolAddresses = async (): Promise<string[]> => {
 const getLiquidityPoolData = async (poolAddress: string): Promise<PoolData> => ({
     // We call Soroban functions on the contract to populate the pool data.
     // Then we try to get more detailed data about the tokens.
-    constantProductOfReserves: await callContract<number>(poolAddress, "k_last"),
+    constantProductOfReserves: await callPoolContract<number>(poolAddress, "k_last"),
     firstToken: await getAssetData(poolAddress, "token_0"),
     poolContract: poolAddress,
-    reserves: await callContract<[number, number]>(poolAddress, "get_reserves"),
+    reserves: await callPoolContract<[number, number]>(poolAddress, "get_reserves"),
     secondToken: await getAssetData(poolAddress, "token_1"),
 });
 
