@@ -1,18 +1,40 @@
-import { Mercury } from "mercury-sdk";
-import "dotenv/config";
+import {
+    getEventsFromSoroswapContracts,
+    getLiquidityPoolAddresses,
+    getLiquidityPoolData,
+    subscribeToSoroswapPair,
+} from "./index";
+import { getColoredMessage } from "./utils";
 
-(async () => {
-    const mercury = new Mercury({
-        backendEndpoint: process.env.MERCURY_BACKEND_ENDPOINT!,
-        graphqlEndpoint: process.env.MERCURY_GRAPHQL_ENDPOINT!,
-        email: process.env.MERCURY_TESTER_EMAIL!,
-        password: process.env.MERCURY_TESTER_PASSWORD!,
-        apiKey: process.env.MERCURY_API_KEY!,
-    });
+// eslint-disable-next-line max-statements, unicorn/prefer-top-level-await
+void (async () => {
+    try {
+        const pools = await getLiquidityPoolAddresses();
 
-    const response = await mercury?.subscribeToContractEvents({
-        contractId: process.env.SOROSWAP_FACTORY_CONTRACT!,
-    });
+        console.log(getColoredMessage("cyan", `Found ${pools.length} liquidity pools`));
 
-    console.log(response);
+        const { 0: firstPool } = pools;
+        const poolData = await getLiquidityPoolData(firstPool as string);
+
+        console.log(getColoredMessage("green", "\nFirst pool details:"));
+        console.log(`Address: ${poolData.poolContract}`);
+        console.log(`First token: ${poolData.firstToken.contract}`);
+        console.log(`Second token: ${poolData.secondToken.contract}`);
+        console.log(`Current reserves: ${poolData.reserves[0]}/${poolData.reserves[1]}`);
+
+        console.log(getColoredMessage("yellow", "\nSubscribing to pool events..."));
+        await subscribeToSoroswapPair(firstPool as string);
+
+        console.log(getColoredMessage("magenta", "\nFetching recent events:"));
+
+        const events = await getEventsFromSoroswapContracts([{ pair: [firstPool as string] }]);
+
+        // eslint-disable-next-line @typescript-eslint/no-magic-numbers
+        events.slice(0, 3).forEach((event) => {
+            console.log(`\n${event.eventType.toUpperCase()}:`);
+            console.log(event);
+        });
+    } catch (error) {
+        console.error(getColoredMessage("red", "\nError:"), error);
+    }
 })();

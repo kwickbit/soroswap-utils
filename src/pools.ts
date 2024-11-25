@@ -23,7 +23,7 @@ type SorobanFunctions = "all_pairs" | "get_reserves" | "k_last" | "token_0" | "t
 const callSorobanFunction = async (
     contractAddress: string,
     sorobanFunctionName: SorobanFunctions,
-    sorobanFunctionArguments: Readonly<xdr.ScVal>,
+    sorobanFunctionArguments?: Readonly<xdr.ScVal>,
 ): Promise<SorobanRpc.Api.RawSimulateTransactionResponse> => {
     // We always need to fetch the source account, to make sure we have the
     // latest sequence number.
@@ -31,11 +31,15 @@ const callSorobanFunction = async (
     const sourceAccount = await server.getAccount(publicKey);
     const contract = new Contract(contractAddress);
 
+    const call = sorobanFunctionArguments
+        ? contract.call(sorobanFunctionName, sorobanFunctionArguments)
+        : contract.call(sorobanFunctionName);
+
     const transaction = new TransactionBuilder(sourceAccount, {
         fee: BASE_FEE,
         networkPassphrase: Networks.TESTNET,
     })
-        .addOperation(contract.call(sorobanFunctionName, sorobanFunctionArguments))
+        .addOperation(call)
         .setTimeout(transactionTimeout)
         .build();
 
@@ -48,7 +52,7 @@ const callPoolContract = async <SomePoolData>(
     poolAddress: string,
     sorobanFunctionName: "get_reserves" | "k_last" | "token_0" | "token_1",
 ): Promise<SomePoolData> => {
-    const result = await callSorobanFunction(poolAddress, sorobanFunctionName, nativeToScVal([]));
+    const result = await callSorobanFunction(poolAddress, sorobanFunctionName);
     const firstResult = result.results?.[0];
 
     if (firstResult === undefined) {

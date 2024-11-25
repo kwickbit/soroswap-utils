@@ -141,7 +141,6 @@ type FactoryEvent =
     | FactoryNewPairEvent;
 
 export type {
-    BaseRawFactoryEvent,
     FactoryEvent,
     FactoryFeeDestinationAddressChangedEvent,
     FactoryFeesEnabledEvent,

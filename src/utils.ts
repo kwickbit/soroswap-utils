@@ -1,6 +1,20 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Mercury } from "mercury-sdk";
 
+type Color = "red" | "green" | "yellow" | "magenta" | "cyan";
+
+// eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
+const colors: Record<Color, string> = {
+    cyan: "\u001B[36m",
+    green: "\u001B[32m",
+    magenta: "\u001B[35m",
+    red: "\u001B[31m",
+    yellow: "\u001B[33m",
+};
+
+const getColoredMessage = (color: Color, message: string): string =>
+    `${colors[color]}${message}\u001B[0m`;
+
 /**
  * Validates that a value is a non-empty string.
  * @param value The value to validate.
@@ -45,4 +59,4 @@ const buildMercuryInstance = (): Mercury => {
     return new Mercury(mercuryArguments);
 };
 
-export { buildMercuryInstance, getEnvironmentVariable, validateString };
+export { buildMercuryInstance, getColoredMessage, getEnvironmentVariable, validateString };
