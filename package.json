@@ -1,8 +1,25 @@
 {
   "name": "soroswap-utils",
-  "module": "src/index.ts",
+  "description": "Utilities for interacting with Soroswap, the decentralized exchange (DEX) on Soroban, which is the smart contracts platform of the Stellar network.",
+  "version": "1.0.0",
+  "author": "KwickBit - the noncustodial stablecoin payment gateway <contact@kwickbit.com> (https://kwickbit.com)",
+  "license": "MIT",
+  "keywords": ["soroswap", "soroban", "stellar", "blockchain", "decentralized", "exchange", "dex", "stablecoin", "payments", "gateway", "mercury", "utilities"],
+  "homepage": "https://kwickbit.com",
+  "bugs": {
+    "url": "https://github.com/kwickbit/soroswap-utils/issues"
+  },
   "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
     "check-typedoc": "bun run src/scripts/check-typedoc.ts",
     "docs": "typedoc --out docs src --skipErrorChecking",
     "docs:serve": "bunx serve docs",
@@ -38,6 +55,7 @@
     "prettier": "^3.3.3",
     "ts-jest": "^29.0.0",
     "ts-node": "^10.9.2",
+    "tsup": "^8.3.5",
     "typedoc": "^0.26.11",
     "typescript": "~5.3.3"
   }

@@ -34,6 +34,7 @@ const subscribeToSoroswapRouter = async (): Promise<boolean> =>
  * Soroswap Pair contracts emit events for operations such as adding or
  * removing liquidity, swapping, or skimming.
  * Use this function to subscribe to those events.
+ * @param pairContract The contract ID of the Soroswap Pair contract.
  * @returns A promise that resolves to true if the subscription was successful.
  */
 const subscribeToSoroswapPair = async (pairContract: string): Promise<boolean> =>

@@ -21,6 +21,7 @@ void (async () => {
         console.log(`First token: ${poolData.firstToken.contract}`);
         console.log(`Second token: ${poolData.secondToken.contract}`);
         console.log(`Current reserves: ${poolData.reserves[0]}/${poolData.reserves[1]}`);
+        console.log(`Current constant product: ${poolData.constantProductOfReserves}`);
 
         console.log(getColoredMessage("yellow", "\nSubscribing to pool events..."));
         await subscribeToSoroswapPair(firstPool as string);

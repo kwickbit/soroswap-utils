@@ -77,7 +77,7 @@ const getSoroswapFactoryEvents = async (
 };
 
 /**
- * Retrieve Soroswap Router contract events.
+ * Retrieve events from Soroswap Router contracts.
  * @param [options] Options for event retrieval
  * @param {boolean} [options.shouldReturnRawEvents] If true, return events in
  * a less structured format, closer to how they are returned by the chain.

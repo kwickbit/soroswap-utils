@@ -13,7 +13,6 @@ import type {
 } from "./types";
 import { getEnvironmentVariable } from "./utils";
 
-const isTestnet = getEnvironmentVariable("IS_TESTNET") === "true";
 const cacheDirectory = join(homedir(), ".cache", "soroswap-utils");
 
 // eslint-disable-next-line unicorn/prefer-top-level-await
@@ -49,6 +48,8 @@ const fetchAssets = async (): Promise<AssetData> => {
     // sets the correct environment.
     const response = await fetch(getEnvironmentVariable("SOROSWAP_ASSETS_URL"));
     const dataFromResponse = (await response.json()) as MainnetResponse | TestnetResponse;
+    const isTestnet = getEnvironmentVariable("IS_TESTNET") === "true";
+
     const data = isTestnet
         ? extractTestnetData(dataFromResponse as TestnetResponse)
         : (dataFromResponse as MainnetResponse);
@@ -72,6 +73,7 @@ const fetchAssets = async (): Promise<AssetData> => {
 };
 
 const readCache = async (): Promise<CacheEntry> => {
+    const isTestnet = getEnvironmentVariable("IS_TESTNET") === "true";
     const content = await readFile(isTestnet ? testnetCacheFile : mainnetCacheFile, "utf8");
 
     return JSON.parse(content) as CacheEntry;
@@ -85,6 +87,8 @@ const getCachedOrFetch = async (): Promise<AssetData> => {
         if (!isDataFresh) {
             return await fetchAssets();
         }
+
+        const isTestnet = getEnvironmentVariable("IS_TESTNET") === "true";
 
         if (!isTestnet) {
             return cache.data as MainnetResponse;
