@@ -1,13 +1,27 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import {
     getEventsFromSoroswapContracts,
     getLiquidityPoolAddresses,
     getLiquidityPoolData,
+    initializeSoroswapUtils,
     subscribeToSoroswapPair,
 } from "./index";
 import { getColoredMessage } from "./utils";
 
 // eslint-disable-next-line max-statements, unicorn/prefer-top-level-await
 void (async () => {
+    initializeSoroswapUtils({
+        mercury: {
+            apiKey: process.env.MERCURY_API_KEY!,
+            backendEndpoint: process.env.MERCURY_BACKEND_ENDPOINT!,
+            graphqlEndpoint: process.env.MERCURY_GRAPHQL_ENDPOINT!,
+        },
+
+        rpc: {
+            privateKey: process.env.STELLAR_WALLET_PRIVATE_KEY!,
+        },
+    });
+
     try {
         const pools = await getLiquidityPoolAddresses();
 

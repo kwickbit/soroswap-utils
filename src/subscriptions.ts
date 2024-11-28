@@ -1,14 +1,15 @@
 import type { SoroswapContract } from "./types";
-import { buildMercuryInstance, getEnvironmentVariable } from "./utils";
+import { buildMercuryInstance, resolveContractId } from "./utils";
 
 const soroswapSubscriber = async (
     contractId: string,
     isEnvironmentVariable = false,
 ): Promise<boolean> => {
     const mercuryInstance = buildMercuryInstance();
+    const resolvedContract = resolveContractId(contractId, isEnvironmentVariable);
 
     const response = await mercuryInstance.subscribeToContractEvents({
-        contractId: isEnvironmentVariable ? getEnvironmentVariable(contractId) : contractId,
+        contractId: resolvedContract,
     });
 
     return response.data as boolean;

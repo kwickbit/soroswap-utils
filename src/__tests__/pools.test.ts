@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { describe, expect, it, jest } from "@jest/globals";
 
+import { initializeSoroswapUtils } from "../config";
 import { getLiquidityPoolAddresses, getLiquidityPoolCount } from "../pools";
 
 describe("getLiquidityPoolCount", () => {
@@ -19,6 +21,18 @@ describe("getLiquidityPoolAddresses", () => {
 
         // eslint-disable-next-line jest/no-confusing-set-timeout
         jest.setTimeout(30_000);
+
+        initializeSoroswapUtils({
+            mercury: {
+                apiKey: process.env.MERCURY_API_KEY!,
+                backendEndpoint: process.env.MERCURY_BACKEND_ENDPOINT!,
+                graphqlEndpoint: process.env.MERCURY_GRAPHQL_ENDPOINT!,
+            },
+
+            rpc: {
+                privateKey: process.env.STELLAR_WALLET_PRIVATE_KEY!,
+            },
+        });
 
         const count = await getLiquidityPoolCount();
         const data = await getLiquidityPoolAddresses();

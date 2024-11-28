@@ -1,6 +1,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Mercury } from "mercury-sdk";
 
+import { getConfig } from "./config";
+
 type Color = "red" | "green" | "yellow" | "magenta" | "cyan";
 
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
@@ -31,32 +33,40 @@ const validateString = (value: unknown, errorMessage: string): string => {
 };
 
 /**
- * Retrieves an environment variable, throwing an error if it is not defined.
- * @param name The name of the environment variable.
- * @returns The value of the environment variable.
- * @throws If the environment variable is not defined.
- */
-const getEnvironmentVariable = (name: string): string => {
-    const {
-        env: { [name]: value },
-    } = process;
-
-    return validateString(value, `Missing required environment variable: ${name}`);
-};
-
-/**
  * Builds a Mercury instance, used to subscribe to contracts and read
  * their events.
  * @returns A Mercury instance.
  */
 const buildMercuryInstance = (): Mercury => {
+    const config = getConfig();
     const mercuryArguments = {
-        apiKey: getEnvironmentVariable("MERCURY_API_KEY"),
-        backendEndpoint: getEnvironmentVariable("MERCURY_BACKEND_ENDPOINT"),
-        graphqlEndpoint: getEnvironmentVariable("MERCURY_GRAPHQL_ENDPOINT"),
+        apiKey: config.mercury.apiKey,
+        backendEndpoint: config.mercury.backendEndpoint,
+        graphqlEndpoint: config.mercury.graphqlEndpoint,
     };
 
     return new Mercury(mercuryArguments);
 };
 
-export { buildMercuryInstance, getColoredMessage, getEnvironmentVariable, validateString };
+const resolveContractId = (contractId: string, isEnvironmentVariable: boolean): string => {
+    const { contracts } = getConfig();
+
+    if (!isEnvironmentVariable) {
+        return contractId;
+    }
+
+    switch (contractId) {
+        case "SOROSWAP_FACTORY_CONTRACT": {
+            return contracts.factory;
+        }
+        case "SOROSWAP_ROUTER_CONTRACT": {
+            return contracts.router;
+        }
+
+        default: {
+            throw new Error(`Unknown contract type: ${contractId}`);
+        }
+    }
+};
+
+export { buildMercuryInstance, getColoredMessage, resolveContractId, validateString };

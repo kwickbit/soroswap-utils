@@ -15,7 +15,7 @@ import type {
     SoroswapContract,
     SoroswapEvent,
 } from "./types";
-import { buildMercuryInstance, getEnvironmentVariable } from "./utils";
+import { buildMercuryInstance, resolveContractId } from "./utils";
 
 interface EventGetterOptions {
     readonly shouldReturnRawEvents: boolean;
@@ -33,8 +33,10 @@ const fetchSoroswapEvents = async (
 ): Promise<RawSoroswapEvent[]> => {
     const mercuryInstance = buildMercuryInstance();
 
+    const resolvedContract = resolveContractId(contractId, isEnvironmentVariable);
+
     const soroswapEvents = await mercuryInstance.getContractEvents({
-        contractId: isEnvironmentVariable ? getEnvironmentVariable(contractId) : contractId,
+        contractId: resolvedContract,
     });
 
     if (soroswapEvents.error !== undefined) {

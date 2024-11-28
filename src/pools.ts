@@ -12,11 +12,11 @@ import {
 } from "@stellar/stellar-sdk";
 
 import { getAssetData as readAssetData } from "./assets";
+import { getConfig } from "./config";
 import type { Asset, PoolData } from "./types";
-import { getEnvironmentVariable, validateString } from "./utils";
+import { validateString } from "./utils";
 
 const transactionTimeout = 30;
-const server = new SorobanRpc.Server(getEnvironmentVariable("SOROBAN_RPC_SERVER"));
 
 type SorobanFunctions = "all_pairs" | "get_reserves" | "k_last" | "token_0" | "token_1";
 
@@ -25,9 +25,12 @@ const callSorobanFunction = async (
     sorobanFunctionName: SorobanFunctions,
     sorobanFunctionArguments?: Readonly<xdr.ScVal>,
 ): Promise<SorobanRpc.Api.RawSimulateTransactionResponse> => {
+    const config = getConfig();
+
     // We always need to fetch the source account, to make sure we have the
     // latest sequence number.
-    const publicKey = Keypair.fromSecret(getEnvironmentVariable("PRIVATE_KEY")).publicKey();
+    const publicKey = Keypair.fromSecret(config.rpc.privateKey).publicKey();
+    const server = new SorobanRpc.Server(config.rpc.url);
     const sourceAccount = await server.getAccount(publicKey);
     const contract = new Contract(contractAddress);
 
@@ -79,8 +82,11 @@ const getAssetData = async (
  * @throws If the contract data cannot be read.
  */
 const getLiquidityPoolCount = async (): Promise<number> => {
+    const config = getConfig();
+    const server = new SorobanRpc.Server(config.rpc.url);
+
     const { val: value } = await server.getContractData(
-        getEnvironmentVariable("SOROSWAP_FACTORY_CONTRACT"),
+        config.contracts.factory,
         xdr.ScVal.scvLedgerKeyContractInstance(),
     );
 
@@ -97,8 +103,10 @@ const getLiquidityPoolCount = async (): Promise<number> => {
 };
 
 const getLiquidityPoolAddress = async (index: number) => {
+    const config = getConfig();
+
     const liquidityPoolAddress = await callSorobanFunction(
-        getEnvironmentVariable("SOROSWAP_FACTORY_CONTRACT"),
+        config.contracts.factory,
         "all_pairs",
         nativeToScVal(index, { type: "u32" }),
     );

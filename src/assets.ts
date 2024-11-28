@@ -2,6 +2,7 @@ import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { join } from "node:path";
 
+import { getConfig } from "./config";
 import type {
     Asset,
     AssetData,
@@ -11,7 +12,6 @@ import type {
     TestnetData,
     TestnetResponse,
 } from "./types";
-import { getEnvironmentVariable } from "./utils";
 
 const cacheDirectory = join(homedir(), ".cache", "soroswap-utils");
 
@@ -46,9 +46,10 @@ const extractTestnetData = (data: TestnetResponse): TestnetData =>
 const fetchAssets = async (): Promise<AssetData> => {
     // The env var name is the same regardless of the network; the command line
     // sets the correct environment.
-    const response = await fetch(getEnvironmentVariable("SOROSWAP_ASSETS_URL"));
+    const config = getConfig();
+    const response = await fetch(config.assets.url);
     const dataFromResponse = (await response.json()) as MainnetResponse | TestnetResponse;
-    const isTestnet = getEnvironmentVariable("IS_TESTNET") === "true";
+    const isTestnet = config.rpc.url.includes("testnet");
 
     const data = isTestnet
         ? extractTestnetData(dataFromResponse as TestnetResponse)
@@ -73,7 +74,7 @@ const fetchAssets = async (): Promise<AssetData> => {
 };
 
 const readCache = async (): Promise<CacheEntry> => {
-    const isTestnet = getEnvironmentVariable("IS_TESTNET") === "true";
+    const isTestnet = getConfig().rpc.url.includes("testnet");
     const content = await readFile(isTestnet ? testnetCacheFile : mainnetCacheFile, "utf8");
 
     return JSON.parse(content) as CacheEntry;
@@ -88,7 +89,7 @@ const getCachedOrFetch = async (): Promise<AssetData> => {
             return await fetchAssets();
         }
 
-        const isTestnet = getEnvironmentVariable("IS_TESTNET") === "true";
+        const isTestnet = getConfig().rpc.url.includes("testnet");
 
         if (!isTestnet) {
             return cache.data as MainnetResponse;
