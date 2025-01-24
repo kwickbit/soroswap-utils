@@ -9,6 +9,8 @@ module.exports = {
         "prettier",
     ],
 
+    // ignorePatterns: ["src/scripts/check-typedoc.ts"],
+
     parserOptions: {
         project: "./tsconfig.eslint.json",
         sourceType: "module",
