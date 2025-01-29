@@ -24,12 +24,12 @@ type DeepPartial<T> = {
 
 const defaultTestnetConfig: Readonly<SoroswapConfig> = {
     assets: {
-        url: "https://github.com/soroswap/core/blob/main/public/tokens.json",
+        url: "https://raw.githubusercontent.com/soroswap/core/refs/heads/main/public/tokens.json",
     },
 
     contracts: {
-        factory: "CD7OQTUYT7J4BN6EQWK6XX5SVDWFLKKFZ3PJ7GUJGLFIJSV52ZIQBWLG",
-        router: "CCPEDSWPNWJTRIODNYO3THDJ6RYTMMAMDCGAIORRISXKGYU632Y475IF",
+        factory: "CDFU6AJUBRMCAI4SIC4S3JLCGWUW3GH4N6EDKPJUKYSAZ56TUZIMUYCB",
+        router: "CC6WRJYMZA574TOXNO2ZWU4HIXJ5OLKGB7JF556RKMZPSV2V62SLBTPK",
     },
 
     mercury: {

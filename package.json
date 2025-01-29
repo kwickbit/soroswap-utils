@@ -27,7 +27,7 @@
     "lint:fix": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts --fix",
     "mainnet:example": "dotenvx run -f .env.production.local -- bun run src/example.ts",
     "prepare": "husky",
-    "test": "dotenvx run -f ../.env -f .env.test.local -- jest",
+    "test": "dotenvx run -f .env -f .env.test.local -- jest",
     "testnet:example": "dotenvx run -f ../.env -f .env.test.local -- bun run src/example.ts",
     "tsn": "node --loader ts-node/esm src/example.ts"
   },

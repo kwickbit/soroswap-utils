@@ -37,11 +37,12 @@ describe("getLiquidityPoolAddresses", () => {
         const count = await getLiquidityPoolCount();
         const data = await getLiquidityPoolAddresses();
 
-        expect(data).toBeInstanceOf(Array);
+        expect(Array.isArray(data)).toBe(true);
         expect(data).toHaveLength(count);
 
         // All addresses should start with C and have 55 other characters,
         // upper case and numbers
-        expect(data.every((address: string) => /^C[\dA-Z]{55}$/v.exec(address))).toBe(true);
+        // eslint-disable-next-line regexp/require-unicode-sets-regexp
+        expect(data.every((address: string) => /^C[\dA-Z]{55}$/u.exec(address))).toBe(true);
     });
 });

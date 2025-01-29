@@ -10,7 +10,7 @@ describe("listCertifiedAssets", () => {
         const data = (await listCertifiedAssets()) as TestnetData;
 
         expect(data.network).toBe("testnet");
-        expect(data.assets).toBeInstanceOf(Array);
+        expect(Array.isArray(data.assets)).toBe(true);
         expect(data.assets).not.toHaveLength(0);
 
         const expectedAssetKeys: readonly (keyof TestnetAsset)[] = [
@@ -34,7 +34,7 @@ describe("listCertifiedAssets", () => {
 
         const { assets } = await listCertifiedAssets(true);
 
-        expect(assets).toBeInstanceOf(Array);
+        expect(Array.isArray(assets)).toBe(true);
         expect(assets).not.toHaveLength(0);
 
         assets.forEach((asset: Readonly<SimpleAsset>) => {
@@ -65,8 +65,9 @@ describe("isCertifiedAsset", () => {
     it("should return true for a certified testnet asset", async () => {
         expect.assertions(1);
 
+        // This test will break whenever the testnet reboots. Oh well.
         await expect(
-            isCertifiedAsset("ARST", "CAEC542FD4QSZG53YKIMQVY35USPM3DOD4QYXRISPJ3EXFMEKUTGRECD"),
+            isCertifiedAsset("ARST", "CATYSR2RNCFKMYNBH6SFWLBJ5ZJTPRQD575I5Q66UHYMMAPNFQOU5AJZ"),
         ).resolves.toBe(true);
     });
 
