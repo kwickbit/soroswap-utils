@@ -27,8 +27,8 @@ void (async () => {
         },
 
         rpc: {
-            privateKey: process.env.STELLAR_WALLET_PRIVATE_KEY!,
             url: process.env.SOROBAN_RPC_SERVER!,
+            wallet: process.env.STELLAR_WALLET!,
         },
     });
 

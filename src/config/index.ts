@@ -12,8 +12,8 @@ interface SoroswapConfig {
         readonly graphqlEndpoint: string;
     };
     readonly rpc: {
-        readonly privateKey: string;
         readonly url: string;
+        readonly wallet: string;
     };
 }
 
@@ -39,17 +39,17 @@ const defaultTestnetConfig: Readonly<SoroswapConfig> = {
     },
 
     rpc: {
-        privateKey: "", // Required - no default
         url: "https://soroban-testnet.stellar.org:443",
+        wallet: "", // Required - no default
     },
 };
 
 // Required config fields that must be provided by the user
 const requiredConfig = [
-    "rpc.privateKey",
     "mercury.apiKey",
     "mercury.backendEndpoint",
     "mercury.graphqlEndpoint",
+    "rpc.wallet",
 ] as const;
 
 const validateConfig = (config: Readonly<SoroswapConfig>): void => {
@@ -68,10 +68,10 @@ const validateConfig = (config: Readonly<SoroswapConfig>): void => {
             (
                 path,
             ): path is
-                | "rpc.privateKey"
                 | "mercury.apiKey"
                 | "mercury.backendEndpoint"
-                | "mercury.graphqlEndpoint" => path !== undefined,
+                | "mercury.graphqlEndpoint"
+                | "rpc.wallet" => path !== undefined,
         );
 
     if (emptyFields.length > 0) {

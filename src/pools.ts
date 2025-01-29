@@ -2,7 +2,6 @@ import {
     Address,
     BASE_FEE,
     Contract,
-    Keypair,
     nativeToScVal,
     Networks,
     scValToNative,
@@ -25,13 +24,15 @@ const callSorobanFunction = async (
     sorobanFunctionName: SorobanFunctions,
     sorobanFunctionArguments?: Readonly<xdr.ScVal>,
 ): Promise<SorobanRpc.Api.RawSimulateTransactionResponse> => {
-    const config = getConfig();
+    const {
+        rpc: { url, wallet },
+    } = getConfig();
+
+    const server = new SorobanRpc.Server(url);
 
     // We always need to fetch the source account, to make sure we have the
     // latest sequence number.
-    const publicKey = Keypair.fromSecret(config.rpc.privateKey).publicKey();
-    const server = new SorobanRpc.Server(config.rpc.url);
-    const sourceAccount = await server.getAccount(publicKey);
+    const sourceAccount = await server.getAccount(wallet);
     const contract = new Contract(contractAddress);
 
     const call = sorobanFunctionArguments

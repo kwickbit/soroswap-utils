@@ -30,7 +30,7 @@ describe("getLiquidityPoolAddresses", () => {
             },
 
             rpc: {
-                privateKey: process.env.STELLAR_WALLET_PRIVATE_KEY!,
+                wallet: process.env.STELLAR_WALLET!,
             },
         });
 

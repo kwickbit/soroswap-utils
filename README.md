@@ -23,8 +23,8 @@ initializeSoroswap({
         graphqlEndpoint: "MERCURY_GRAPHQL"   // Required
     },
     rpc: {
-        privateKey: "YOUR_PRIVATE_KEY",      // Required
         url:     // Provide if interacting with the Stellar mainnet
+        wallet: "YOUR_STELLAR_WALLET",       // Required
     }
 });
 ```
