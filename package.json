@@ -1,7 +1,7 @@
 {
   "name": "soroswap-utils",
   "description": "Utilities for interacting with Soroswap, the decentralized exchange (DEX) on Soroban, which is the smart contracts platform of the Stellar network.",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "author": "KwickBit - the noncustodial stablecoin payment gateway <contact@kwickbit.com> (https://kwickbit.com)",
   "license": "MIT",
   "keywords": [

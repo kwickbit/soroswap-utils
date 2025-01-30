@@ -22,6 +22,7 @@ interface TestnetData {
     readonly assets: readonly TestnetAsset[];
     readonly network: "mainnet" | "testnet" | "standalone";
 }
+type TestnetResponse = readonly TestnetData[];
 interface MainnetResponse {
     readonly assets: readonly DetailedAsset[];
     readonly description: string;
@@ -32,6 +33,10 @@ interface MainnetResponse {
     readonly version: string;
 }
 type AssetData = MainnetResponse | TestnetData;
+interface CacheEntry {
+    readonly data: AssetData;
+    readonly timestamp: number;
+}
 interface PoolData {
     constantProductOfReserves: number;
     firstToken: Asset;
@@ -56,6 +61,7 @@ type PairEventType = "deposit" | "skim" | "swap" | "sync" | "withdraw";
 type RouterEventType = "add" | "init" | "remove" | "swap";
 type TokenAdminEventType = "clawback" | "mint" | "set_admin" | "set_authorized";
 type TokenEventType = "approve" | "burn" | "transfer";
+type ExtendedTokenEventType = TokenEventType | TokenAdminEventType;
 type EventType = FactoryEventType | PairEventType | RouterEventType | TokenAdminEventType | TokenEventType;
 type ContractType = "SoroswapFactory" | "SoroswapPair" | "SoroswapRouter" | "SorobanToken";
 interface BaseRawEvent {
@@ -415,6 +421,7 @@ interface RouterSwapEvent extends BaseRouterEvent {
 }
 type RouterEvent = RouterAddLiquidityEvent | RouterInitializedEvent | RouterRemoveLiquidityEvent | RouterSwapEvent;
 
+type RawSoroswapEvent = RawExtendedPairEvent | RawFactoryEvent | RawRouterEvent;
 type SoroswapEvent = ExtendedPairEvent | FactoryEvent | RouterEvent;
 
 /**
@@ -589,4 +596,4 @@ declare const subscribeToSoroswapPairs: (contractIds: readonly string[]) => Prom
  */
 declare const subscribeToSoroswapContracts: (contractTypes: readonly SoroswapContract[]) => Promise<boolean>;
 
-export { getAssetData, getEventsFromSoroswapContracts, getEventsFromSoroswapPairs, getLiquidityPoolAddresses, getLiquidityPoolCount, getLiquidityPoolData, getSoroswapFactoryEvents, getSoroswapPairEvents, getSoroswapRouterEvents, initializeSoroswapUtils, isCertifiedAsset, listCertifiedAssets, subscribeToSoroswapContracts, subscribeToSoroswapFactory, subscribeToSoroswapPair, subscribeToSoroswapPairs, subscribeToSoroswapRouter };
+export { type Asset, type AssetData, type BaseEvent, type BaseRawEvent, type CacheEntry, type ContractType, type EventType, type ExtendedPairEvent, type ExtendedTokenEventType, type FactoryEvent, type FactoryFeeDestinationAddressChangedEvent, type FactoryFeeSettingAddressChangedEvent, type FactoryFeesEnabledEvent, type FactoryInitializedEvent, type FactoryNewPairEvent, type MainnetResponse, type PairDepositEvent, type PairProperEvent, type PairSkimEvent, type PairSwapEvent, type PairSyncEvent, type PairWithdrawEvent, type PoolData, type RawExtendedPairEvent, type RawFactoryEvent, type RawFactoryFeeToEvent, type RawFactoryFeesEvent, type RawFactoryInitEvent, type RawFactoryNewPairEvent, type RawFactorySetterEvent, type RawPairDepositEvent, type RawPairProperEvent, type RawPairSkimEvent, type RawPairSwapEvent, type RawPairSyncEvent, type RawPairWithdrawEvent, type RawRouterEvent, type RawRouterInitEvent, type RawRouterLiquidityEvent, type RawRouterSwapEvent, type RawSoroswapEvent, type RawTokenAdminEvent, type RawTokenEvent, type RouterAddLiquidityEvent, type RouterEvent, type RouterInitializedEvent, type RouterRemoveLiquidityEvent, type RouterSwapEvent, type SimpleAsset, type SoroswapContract, type SoroswapEvent, type TestnetAsset, type TestnetData, type TestnetResponse, type TokenAdminEvent, type TokenApproveEvent, type TokenBurnEvent, type TokenClawbackEvent, type TokenEvent, type TokenMintEvent, type TokenSetAdminEvent, type TokenSetAuthorizedEvent, type TokenTransferEvent, getAssetData, getEventsFromSoroswapContracts, getEventsFromSoroswapPairs, getLiquidityPoolAddresses, getLiquidityPoolCount, getLiquidityPoolData, getSoroswapFactoryEvents, getSoroswapPairEvents, getSoroswapRouterEvents, initializeSoroswapUtils, isCertifiedAsset, listCertifiedAssets, subscribeToSoroswapContracts, subscribeToSoroswapFactory, subscribeToSoroswapPair, subscribeToSoroswapPairs, subscribeToSoroswapRouter };
