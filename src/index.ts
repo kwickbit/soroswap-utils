@@ -1,5 +1,6 @@
 // Rule disabled because this is a library, to be imported by other packages
 /* eslint-disable import/no-unused-modules */
+
 export { getAssetData, isCertifiedAsset, listCertifiedAssets } from "./assets";
 export { initializeSoroswapUtils } from "./config";
 export {
@@ -17,3 +18,5 @@ export {
     subscribeToSoroswapPairs,
     subscribeToSoroswapRouter,
 } from "./subscriptions";
+// eslint-disable-next-line sonar/no-wildcard-import
+export type * from "./types";
