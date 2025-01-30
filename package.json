@@ -1,10 +1,23 @@
 {
   "name": "soroswap-utils",
   "description": "Utilities for interacting with Soroswap, the decentralized exchange (DEX) on Soroban, which is the smart contracts platform of the Stellar network.",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "author": "KwickBit - the noncustodial stablecoin payment gateway <contact@kwickbit.com> (https://kwickbit.com)",
   "license": "MIT",
-  "keywords": ["soroswap", "soroban", "stellar", "blockchain", "decentralized", "exchange", "dex", "stablecoin", "payments", "gateway", "mercury", "utilities"],
+  "keywords": [
+    "soroswap",
+    "soroban",
+    "stellar",
+    "blockchain",
+    "decentralized",
+    "exchange",
+    "dex",
+    "stablecoin",
+    "payments",
+    "gateway",
+    "mercury",
+    "utilities"
+  ],
   "homepage": "https://kwickbit.com",
   "bugs": {
     "url": "https://github.com/kwickbit/soroswap-utils/issues"
@@ -18,15 +31,15 @@
       "require": "./dist/index.cjs"
     }
   },
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "check-typedoc": "bun run src/scripts/check-typedoc.ts",
     "docs": "typedoc --out docs src --skipErrorChecking",
     "docs:serve": "bunx serve docs",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts",
     "lint:fix": "ESLINT_USE_FLAT_CONFIG=false eslint . --ext .ts --fix",
     "mainnet:example": "dotenvx run -f .env.production.local -- bun run src/example.ts",
-    "prepare": "husky",
+    "prepare": "husky && bun run build",
     "test": "dotenvx run -f .env -f .env.test.local -- jest",
     "testnet:example": "dotenvx run -f ../.env -f .env.test.local -- bun run src/example.ts",
     "tsn": "node --loader ts-node/esm src/example.ts"
@@ -35,7 +48,8 @@
     "@dotenvx/dotenvx": "^1.21.0",
     "@stellar/stellar-sdk": "^12.3.0",
     "@types/glob": "^8.1.0",
-    "glob": "^11.0.0"
+    "glob": "^11.0.0",
+    "mercury-sdk": "github:kwickbit/mercury-sdk#soroswap-adapt"
   },
   "devDependencies": {
     "@jest/globals": "^29.7.0",

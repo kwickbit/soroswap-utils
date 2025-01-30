@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { getContractEventsParser } from "mercury-sdk";
 
 import { parseFactoryEvent } from "./event_parsers/factory";
@@ -47,7 +46,7 @@ const fetchSoroswapEvents = async (
         throw new Error("No events found");
     }
 
-    return getContractEventsParser(soroswapEvents.data) as RawSoroswapEvent[];
+    return getContractEventsParser(soroswapEvents.data) as unknown as RawSoroswapEvent[];
 };
 
 /**

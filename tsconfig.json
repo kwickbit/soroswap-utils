@@ -17,11 +17,6 @@
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "paths": {
-      "mercury-sdk": [
-        "../mercury-sdk/src/index.ts"
-      ]
-    },
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",

@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { Mercury } from "mercury-sdk";
 
 import { getConfig } from "./config";

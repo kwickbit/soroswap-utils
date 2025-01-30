@@ -9,8 +9,6 @@ module.exports = {
         "prettier",
     ],
 
-    // ignorePatterns: ["src/scripts/check-typedoc.ts"],
-
     parserOptions: {
         project: "./tsconfig.eslint.json",
         sourceType: "module",
@@ -37,7 +35,9 @@ module.exports = {
 
         "@typescript-eslint/no-shadow": ["error", { allow: ["expect"] }],
         "@typescript-eslint/no-throw-literal": "off",
+        "@typescript-eslint/no-unsafe-type-assertion": "off",
         "@typescript-eslint/non-nullable-type-assertion-style": "off",
+        "@typescript-eslint/strict-boolean-expressions": "off",
 
         "@typescript-eslint/switch-exhaustiveness-check": [
             "error",
