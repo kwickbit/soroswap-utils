@@ -4,6 +4,7 @@ import {
     getLiquidityPoolAddresses,
     getLiquidityPoolData,
     initializeSoroswapUtils,
+    listCertifiedAssets,
     subscribeToSoroswapPair,
 } from "./index";
 import { getColoredMessage } from "./utils";
@@ -33,8 +34,10 @@ void (async () => {
     });
 
     try {
+        const { assets } = await listCertifiedAssets();
         const pools = await getLiquidityPoolAddresses();
 
+        console.log(getColoredMessage("cyan", `Found ${assets.length} Soroswap assets`));
         console.log(getColoredMessage("cyan", `Found ${pools.length} liquidity pools`));
 
         const { 0: firstPool } = pools;

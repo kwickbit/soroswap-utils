@@ -1,5 +1,5 @@
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 
 import { getConfig } from "./config";
 import type {
@@ -12,9 +12,7 @@ import type {
     TestnetResponse,
 } from "./types";
 
-// eslint-disable-next-line unicorn/prefer-module
-const packageRoot = dirname(dirname(require.resolve("soroswap-utils/package.json")));
-const cacheDirectory = join(packageRoot, "data");
+const cacheDirectory = join(process.cwd(), "node_modules", "soroswap-utils", ".cache");
 
 // eslint-disable-next-line unicorn/prefer-top-level-await
 void (async () => {
