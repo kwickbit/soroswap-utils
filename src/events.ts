@@ -32,6 +32,9 @@ const fetchSoroswapEvents = async (
 ): Promise<RawSoroswapEvent[]> => {
     const mercuryInstance = buildMercuryInstance();
 
+    console.error("Hello from fetchSoroswapEvents");
+    console.error(JSON.stringify(mercuryInstance));
+
     const resolvedContract = resolveContractId(contractId, isEnvironmentVariable);
 
     const soroswapEvents = await mercuryInstance.getContractEvents({
@@ -88,8 +91,6 @@ const getSoroswapFactoryEvents = async (
 const getSoroswapRouterEvents = async (
     options?: EventGetterOptions,
 ): Promise<readonly (RouterEvent | RawRouterEvent)[]> => {
-    console.error("Hello from getSoroswapRouterEvents");
-
     const rawEvents = (await fetchSoroswapEvents(
         "SOROSWAP_ROUTER_CONTRACT",
         true,
