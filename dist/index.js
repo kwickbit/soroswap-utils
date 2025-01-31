@@ -1,7 +1,13 @@
+var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+}) : x)(function(x) {
+  if (typeof require !== "undefined") return require.apply(this, arguments);
+  throw Error('Dynamic require of "' + x + '" is not supported');
+});
+
 // src/assets.ts
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 // src/config/index.ts
 var defaultTestnetConfig = {
@@ -62,12 +68,13 @@ var initializeSoroswapUtils = (userConfig) => {
 var getConfig = () => config;
 
 // src/assets.ts
-var cacheDirectory = join(homedir(), ".cache", "soroswap-utils");
+var packageRoot = dirname(dirname(__require.resolve("soroswap-utils/package.json")));
+var cacheDirectory = join(packageRoot, "data");
 void (async () => {
   try {
     await access(cacheDirectory);
   } catch {
-    await mkdir(cacheDirectory);
+    await mkdir(cacheDirectory, { recursive: true });
   }
 })();
 var mainnetCacheFile = join(cacheDirectory, "assets.json");

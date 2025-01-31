@@ -1,6 +1,5 @@
 import { access, mkdir, readFile, writeFile } from "node:fs/promises";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 import { getConfig } from "./config";
 import type {
@@ -13,14 +12,17 @@ import type {
     TestnetResponse,
 } from "./types";
 
-const cacheDirectory = join(homedir(), ".cache", "soroswap-utils");
+// eslint-disable-next-line unicorn/prefer-module
+const packageRoot = dirname(dirname(require.resolve("soroswap-utils/package.json")));
+const cacheDirectory = join(packageRoot, "data");
 
 // eslint-disable-next-line unicorn/prefer-top-level-await
 void (async () => {
     try {
         await access(cacheDirectory);
     } catch {
-        await mkdir(cacheDirectory);
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        await mkdir(cacheDirectory, { recursive: true });
     }
 })();
 
