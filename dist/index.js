@@ -470,12 +470,12 @@ var resolveContractId = (contractId, isEnvironmentVariable) => {
 // src/events.ts
 var fetchSoroswapEvents = async (contractId, isEnvironmentVariable = false) => {
   const mercuryInstance = buildMercuryInstance();
-  console.error("Hello from fetchSoroswapEvents");
-  console.error(JSON.stringify(mercuryInstance));
   const resolvedContract = resolveContractId(contractId, isEnvironmentVariable);
   const soroswapEvents = await mercuryInstance.getContractEvents({
     contractId: resolvedContract
   });
+  console.error("Hello from fetchSoroswapEvents");
+  console.error(JSON.stringify(soroswapEvents));
   if (soroswapEvents.error !== void 0) {
     throw new Error(soroswapEvents.error);
   }
