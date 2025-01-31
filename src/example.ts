@@ -3,8 +3,10 @@ import {
     getEventsFromSoroswapContracts,
     getLiquidityPoolAddresses,
     getLiquidityPoolData,
+    getSoroswapRouterEvents,
     initializeSoroswapUtils,
     listCertifiedAssets,
+    type RouterEvent,
     subscribeToSoroswapPair,
 } from "./index";
 import { getColoredMessage } from "./utils";
@@ -36,9 +38,11 @@ void (async () => {
     try {
         const { assets } = await listCertifiedAssets();
         const pools = await getLiquidityPoolAddresses();
+        const allRouterEvents = (await getSoroswapRouterEvents()) as RouterEvent[];
 
         console.log(getColoredMessage("cyan", `Found ${assets.length} Soroswap assets`));
         console.log(getColoredMessage("cyan", `Found ${pools.length} liquidity pools`));
+        console.log(getColoredMessage("cyan", `Found ${allRouterEvents.length} router events`));
 
         const { 0: firstPool } = pools;
         const poolData = await getLiquidityPoolData(firstPool as string);
