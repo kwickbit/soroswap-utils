@@ -536,11 +536,15 @@ var getSoroswapFactoryEvents = async (options) => {
   return await Promise.all(rawEvents.map(parseFactoryEvent));
 };
 var getSoroswapRouterEvents = async (options) => {
-  console.error("Hello from getSoroswapRouterEvents");
   const rawEvents = await fetchSoroswapEvents(
     "SOROSWAP_ROUTER_CONTRACT",
     true
   );
+  if (rawEvents.some((event) => !["add", "init", "remove", "swap"].includes(event.topic2))) {
+    console.log("There is some event whose topic is not quite right.");
+  } else {
+    console.log("The problem most likely is in fetching assets.");
+  }
   if (options?.shouldReturnRawEvents !== void 0 && options.shouldReturnRawEvents) {
     return rawEvents;
   }

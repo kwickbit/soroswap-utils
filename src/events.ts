@@ -88,12 +88,22 @@ const getSoroswapFactoryEvents = async (
 const getSoroswapRouterEvents = async (
     options?: EventGetterOptions,
 ): Promise<readonly (RouterEvent | RawRouterEvent)[]> => {
-    console.error("Hello from getSoroswapRouterEvents");
-
     const rawEvents = (await fetchSoroswapEvents(
         "SOROSWAP_ROUTER_CONTRACT",
         true,
     )) as RawRouterEvent[];
+
+    // At this point I have two main hypotheses: either we get some event that
+    // parseRouterEvent cannot handle (possibly because its `topic2` is not one
+    // of add, init, remove, swap), or parsing one of the events fails. I'd bet
+    // it's the latter, with the error related to an asset; I need to figure
+    // out the asset fetching thing urgently, and maybe even hard-code it.
+
+    if (rawEvents.some((event) => !["add", "init", "remove", "swap"].includes(event.topic2))) {
+        console.log("There is some event whose topic is not quite right.");
+    } else {
+        console.log("The problem most likely is in fetching assets.");
+    }
 
     if (options?.shouldReturnRawEvents !== undefined && options.shouldReturnRawEvents) {
         return rawEvents;

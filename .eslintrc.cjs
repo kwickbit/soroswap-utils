@@ -9,6 +9,8 @@ module.exports = {
         "prettier",
     ],
 
+    ignorePatterns: ["postinstall.js"],
+
     parserOptions: {
         project: "./tsconfig.eslint.json",
         sourceType: "module",
