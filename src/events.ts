@@ -38,9 +38,6 @@ const fetchSoroswapEvents = async (
         contractId: resolvedContract,
     });
 
-    console.error("Hello from fetchSoroswapEvents");
-    console.error(JSON.stringify(soroswapEvents));
-
     if (soroswapEvents.error !== undefined) {
         throw new Error(soroswapEvents.error);
     }
@@ -95,6 +92,10 @@ const getSoroswapRouterEvents = async (
         "SOROSWAP_ROUTER_CONTRACT",
         true,
     )) as RawRouterEvent[];
+
+    console.error(
+        "If this logs, my hypothesis that the error is in getContractEventsParser is wrong.",
+    );
 
     if (options?.shouldReturnRawEvents !== undefined && options.shouldReturnRawEvents) {
         return rawEvents;

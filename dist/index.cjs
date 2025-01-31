@@ -516,8 +516,6 @@ var fetchSoroswapEvents = async (contractId, isEnvironmentVariable = false) => {
   const soroswapEvents = await mercuryInstance.getContractEvents({
     contractId: resolvedContract
   });
-  console.error("Hello from fetchSoroswapEvents");
-  console.error(JSON.stringify(soroswapEvents));
   if (soroswapEvents.error !== void 0) {
     throw new Error(soroswapEvents.error);
   }
@@ -541,6 +539,9 @@ var getSoroswapRouterEvents = async (options) => {
   const rawEvents = await fetchSoroswapEvents(
     "SOROSWAP_ROUTER_CONTRACT",
     true
+  );
+  console.error(
+    "If this logs, my hypothesis that the error is in getContractEventsParser is wrong."
   );
   if (options?.shouldReturnRawEvents !== void 0 && options.shouldReturnRawEvents) {
     return rawEvents;
