@@ -387,53 +387,63 @@ var parsePairEvent = (rawEvent) => {
 };
 
 // src/event_parsers/router.ts
-var parseRouterAddLiquidityEvent = async (rawEvent) => ({
+var doGetAssetData = (assets, token) => {
+  const assetData = assets.assets.find((asset) => asset.contract === token);
+  if (assetData === void 0) {
+    return { contract: token, isSoroswapCertified: false };
+  }
+  return assetData;
+};
+var parseRouterAddLiquidityEvent = (rawEvent, soroswapAssets) => ({
   ...parseCommonProperties(rawEvent),
   amountOfFirstTokenDeposited: BigInt(rawEvent.amount_a),
   amountOfSecondTokenDeposited: BigInt(rawEvent.amount_b),
-  firstToken: await getAssetData(rawEvent.token_a),
+  firstToken: doGetAssetData(soroswapAssets, rawEvent.token_a),
   liquidityPoolAddress: rawEvent.pair,
   liquidityPoolTokensMinted: BigInt(rawEvent.liquidity),
   recipientAddress: rawEvent.to,
-  secondToken: await getAssetData(rawEvent.token_b)
+  secondToken: doGetAssetData(soroswapAssets, rawEvent.token_b)
 });
 var parseRouterInitEvent = (rawEvent) => ({
   ...parseCommonProperties(rawEvent),
   factoryAddress: rawEvent.factory
 });
-var parseRouterRemoveLiquidityEvent = async (rawEvent) => ({
+var parseRouterRemoveLiquidityEvent = (rawEvent, soroswapAssets) => ({
   ...parseCommonProperties(rawEvent),
   amountOfFirstTokenWithdrawn: BigInt(rawEvent.amount_a),
   amountOfSecondTokenWithdrawn: BigInt(rawEvent.amount_b),
-  firstToken: await getAssetData(rawEvent.token_a),
+  firstToken: doGetAssetData(soroswapAssets, rawEvent.token_a),
   liquidityPoolAddress: rawEvent.pair,
   liquidityPoolTokensBurned: BigInt(rawEvent.liquidity),
   recipientAddress: rawEvent.to,
-  secondToken: await getAssetData(rawEvent.token_b)
+  secondToken: doGetAssetData(soroswapAssets, rawEvent.token_b)
 });
-var parseRouterSwapEvent = async (rawEvent) => ({
+var parseRouterSwapEvent = (rawEvent, soroswapAssets) => ({
   ...parseCommonProperties(rawEvent),
   recipientAddress: rawEvent.to,
   tokenAmountsInSequence: rawEvent.amounts.map(BigInt),
-  tradedTokenSequence: await Promise.all(rawEvent.path.map(getAssetData))
+  tradedTokenSequence: rawEvent.path.map((token) => doGetAssetData(soroswapAssets, token))
 });
 var parseRouterEvent = async (rawEvent) => {
+  const soroswapAssets = await getCachedOrFetch();
   switch (rawEvent.topic2) {
     case "add": {
-      return await parseRouterAddLiquidityEvent(
-        rawEvent
+      return parseRouterAddLiquidityEvent(
+        rawEvent,
+        soroswapAssets
       );
     }
     case "init": {
       return parseRouterInitEvent(rawEvent);
     }
     case "remove": {
-      return await parseRouterRemoveLiquidityEvent(
-        rawEvent
+      return parseRouterRemoveLiquidityEvent(
+        rawEvent,
+        soroswapAssets
       );
     }
     case "swap": {
-      return await parseRouterSwapEvent(rawEvent);
+      return parseRouterSwapEvent(rawEvent, soroswapAssets);
     }
     default: {
       throw new Error("Unknown SoroswapRouter event type.");

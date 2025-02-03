@@ -1,5 +1,7 @@
-import { getAssetData } from "../assets";
+import { getCachedOrFetch } from "../assets";
 import type {
+    Asset,
+    AssetData,
     RawRouterEvent,
     RawRouterInitEvent,
     RawRouterLiquidityEvent,
@@ -12,17 +14,30 @@ import type {
 } from "../types";
 import { parseCommonProperties } from "./common";
 
-const parseRouterAddLiquidityEvent = async (
+const doGetAssetData = (assets: AssetData, token: string): Asset => {
+    const assetData = assets.assets.find((asset) => asset.contract === token);
+
+    // We have full data for a list of certified assets, but it is possible to
+    // have other tokens in pools, and those we don't have data for.
+    if (assetData === undefined) {
+        return { contract: token, isSoroswapCertified: false };
+    }
+
+    return assetData;
+};
+
+const parseRouterAddLiquidityEvent = (
     rawEvent: RawRouterLiquidityEvent & { readonly topic2: "add" },
-): Promise<RouterAddLiquidityEvent> => ({
+    soroswapAssets: AssetData,
+): RouterAddLiquidityEvent => ({
     ...parseCommonProperties(rawEvent),
     amountOfFirstTokenDeposited: BigInt(rawEvent.amount_a),
     amountOfSecondTokenDeposited: BigInt(rawEvent.amount_b),
-    firstToken: await getAssetData(rawEvent.token_a),
+    firstToken: doGetAssetData(soroswapAssets, rawEvent.token_a),
     liquidityPoolAddress: rawEvent.pair,
     liquidityPoolTokensMinted: BigInt(rawEvent.liquidity),
     recipientAddress: rawEvent.to,
-    secondToken: await getAssetData(rawEvent.token_b),
+    secondToken: doGetAssetData(soroswapAssets, rawEvent.token_b),
 });
 
 const parseRouterInitEvent = (rawEvent: RawRouterInitEvent): RouterInitializedEvent => ({
@@ -30,43 +45,52 @@ const parseRouterInitEvent = (rawEvent: RawRouterInitEvent): RouterInitializedEv
     factoryAddress: rawEvent.factory,
 });
 
-const parseRouterRemoveLiquidityEvent = async (
+const parseRouterRemoveLiquidityEvent = (
     rawEvent: RawRouterLiquidityEvent & { readonly topic2: "remove" },
-): Promise<RouterRemoveLiquidityEvent> => ({
+    soroswapAssets: AssetData,
+): RouterRemoveLiquidityEvent => ({
     ...parseCommonProperties(rawEvent),
     amountOfFirstTokenWithdrawn: BigInt(rawEvent.amount_a),
     amountOfSecondTokenWithdrawn: BigInt(rawEvent.amount_b),
-    firstToken: await getAssetData(rawEvent.token_a),
+    firstToken: doGetAssetData(soroswapAssets, rawEvent.token_a),
     liquidityPoolAddress: rawEvent.pair,
     liquidityPoolTokensBurned: BigInt(rawEvent.liquidity),
     recipientAddress: rawEvent.to,
-    secondToken: await getAssetData(rawEvent.token_b),
+    secondToken: doGetAssetData(soroswapAssets, rawEvent.token_b),
 });
 
-const parseRouterSwapEvent = async (rawEvent: RawRouterSwapEvent): Promise<RouterSwapEvent> => ({
+const parseRouterSwapEvent = (
+    rawEvent: RawRouterSwapEvent,
+    soroswapAssets: AssetData,
+): RouterSwapEvent => ({
     ...parseCommonProperties(rawEvent),
     recipientAddress: rawEvent.to,
     tokenAmountsInSequence: rawEvent.amounts.map(BigInt),
-    tradedTokenSequence: await Promise.all(rawEvent.path.map(getAssetData)),
+
+    tradedTokenSequence: rawEvent.path.map((token) => doGetAssetData(soroswapAssets, token)),
 });
 
 const parseRouterEvent = async (rawEvent: RawRouterEvent): Promise<RouterEvent> => {
+    const soroswapAssets = await getCachedOrFetch();
+
     switch (rawEvent.topic2) {
         case "add": {
-            return await parseRouterAddLiquidityEvent(
+            return parseRouterAddLiquidityEvent(
                 rawEvent as RawRouterLiquidityEvent & { topic2: "add" },
+                soroswapAssets,
             );
         }
         case "init": {
             return parseRouterInitEvent(rawEvent);
         }
         case "remove": {
-            return await parseRouterRemoveLiquidityEvent(
+            return parseRouterRemoveLiquidityEvent(
                 rawEvent as RawRouterLiquidityEvent & { topic2: "remove" },
+                soroswapAssets,
             );
         }
         case "swap": {
-            return await parseRouterSwapEvent(rawEvent);
+            return parseRouterSwapEvent(rawEvent, soroswapAssets);
         }
 
         default: {

@@ -190,4 +190,4 @@ const getAssetData = async (contract: string): Promise<Asset> => {
     return assetData;
 };
 
-export { getAssetData, isCertifiedAsset, listCertifiedAssets };
+export { getAssetData, getCachedOrFetch, isCertifiedAsset, listCertifiedAssets };
