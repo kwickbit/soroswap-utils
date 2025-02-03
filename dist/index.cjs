@@ -144,12 +144,16 @@ var fetchAssets = async () => {
 };
 var readCache = async () => {
   const isTestnet = getConfig().rpc.url.includes("testnet");
-  const content = await (0, import_promises.readFile)(isTestnet ? testnetCacheFile : mainnetCacheFile, "utf8");
+  const file = isTestnet ? testnetCacheFile : mainnetCacheFile;
+  console.log(`Reading cache from ${file} on ${isTestnet ? "testnet" : "mainnet"}.`);
+  console.log("Expected: reading node_modules/soroswap-utils/.cache/assets.json on mainnet.");
+  const content = await (0, import_promises.readFile)(file, "utf8");
   return JSON.parse(content);
 };
 var getCachedOrFetch = async () => {
   try {
     const cache = await readCache();
+    console.log("Successfully read cache.");
     const isDataFresh = Date.now() - cache.timestamp < cacheTtl;
     if (!isDataFresh) {
       console.log(
