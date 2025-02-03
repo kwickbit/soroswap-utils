@@ -1,4 +1,3 @@
-import { getCachedOrFetch } from "../assets";
 import type {
     Asset,
     AssetData,
@@ -28,16 +27,16 @@ const doGetAssetData = (assets: AssetData, token: string): Asset => {
 
 const parseRouterAddLiquidityEvent = (
     rawEvent: RawRouterLiquidityEvent & { readonly topic2: "add" },
-    soroswapAssets: AssetData,
+    assets: AssetData,
 ): RouterAddLiquidityEvent => ({
     ...parseCommonProperties(rawEvent),
     amountOfFirstTokenDeposited: BigInt(rawEvent.amount_a),
     amountOfSecondTokenDeposited: BigInt(rawEvent.amount_b),
-    firstToken: doGetAssetData(soroswapAssets, rawEvent.token_a),
+    firstToken: doGetAssetData(assets, rawEvent.token_a),
     liquidityPoolAddress: rawEvent.pair,
     liquidityPoolTokensMinted: BigInt(rawEvent.liquidity),
     recipientAddress: rawEvent.to,
-    secondToken: doGetAssetData(soroswapAssets, rawEvent.token_b),
+    secondToken: doGetAssetData(assets, rawEvent.token_b),
 });
 
 const parseRouterInitEvent = (rawEvent: RawRouterInitEvent): RouterInitializedEvent => ({
@@ -47,37 +46,35 @@ const parseRouterInitEvent = (rawEvent: RawRouterInitEvent): RouterInitializedEv
 
 const parseRouterRemoveLiquidityEvent = (
     rawEvent: RawRouterLiquidityEvent & { readonly topic2: "remove" },
-    soroswapAssets: AssetData,
+    assets: AssetData,
 ): RouterRemoveLiquidityEvent => ({
     ...parseCommonProperties(rawEvent),
     amountOfFirstTokenWithdrawn: BigInt(rawEvent.amount_a),
     amountOfSecondTokenWithdrawn: BigInt(rawEvent.amount_b),
-    firstToken: doGetAssetData(soroswapAssets, rawEvent.token_a),
+    firstToken: doGetAssetData(assets, rawEvent.token_a),
     liquidityPoolAddress: rawEvent.pair,
     liquidityPoolTokensBurned: BigInt(rawEvent.liquidity),
     recipientAddress: rawEvent.to,
-    secondToken: doGetAssetData(soroswapAssets, rawEvent.token_b),
+    secondToken: doGetAssetData(assets, rawEvent.token_b),
 });
 
 const parseRouterSwapEvent = (
     rawEvent: RawRouterSwapEvent,
-    soroswapAssets: AssetData,
+    assets: AssetData,
 ): RouterSwapEvent => ({
     ...parseCommonProperties(rawEvent),
     recipientAddress: rawEvent.to,
     tokenAmountsInSequence: rawEvent.amounts.map(BigInt),
 
-    tradedTokenSequence: rawEvent.path.map((token) => doGetAssetData(soroswapAssets, token)),
+    tradedTokenSequence: rawEvent.path.map((token) => doGetAssetData(assets, token)),
 });
 
-const parseRouterEvent = async (rawEvent: RawRouterEvent): Promise<RouterEvent> => {
-    const soroswapAssets = await getCachedOrFetch();
-
+const parseRouterEvent = (rawEvent: RawRouterEvent, assets: AssetData): RouterEvent => {
     switch (rawEvent.topic2) {
         case "add": {
             return parseRouterAddLiquidityEvent(
                 rawEvent as RawRouterLiquidityEvent & { topic2: "add" },
-                soroswapAssets,
+                assets,
             );
         }
         case "init": {
@@ -86,11 +83,11 @@ const parseRouterEvent = async (rawEvent: RawRouterEvent): Promise<RouterEvent> 
         case "remove": {
             return parseRouterRemoveLiquidityEvent(
                 rawEvent as RawRouterLiquidityEvent & { topic2: "remove" },
-                soroswapAssets,
+                assets,
             );
         }
         case "swap": {
-            return parseRouterSwapEvent(rawEvent, soroswapAssets);
+            return parseRouterSwapEvent(rawEvent, assets);
         }
 
         default: {

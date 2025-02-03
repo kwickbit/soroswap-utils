@@ -1,5 +1,6 @@
 import { getContractEventsParser } from "mercury-sdk";
 
+import { getCachedOrFetch } from "./assets";
 import { parseFactoryEvent } from "./event_parsers/factory";
 import { parsePairEvent } from "./event_parsers/pair";
 import { parseRouterEvent } from "./event_parsers/router";
@@ -97,9 +98,11 @@ const getSoroswapRouterEvents = async (
         return rawEvents;
     }
 
-    console.log("\n\n\nAt this point, we should get a ton of logs from `getCachedOrFetch`.");
+    console.log("\n\n\nAt this point, we should get just one log from `getCachedOrFetch`.");
 
-    return await Promise.all(rawEvents.map(parseRouterEvent));
+    const assets = await getCachedOrFetch();
+
+    return rawEvents.map((event) => parseRouterEvent(event, assets));
 };
 
 /**

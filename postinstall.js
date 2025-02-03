@@ -11,7 +11,7 @@ void (async () => {
   const failFile = path.resolve(__dirname, `error.txt`);
 
   if (await fs.promises.stat(successFile).catch(() => false)) {
-    await fs.promises.unlink(successFile);
+    return;
   }
 
   if (await fs.promises.stat(failFile).catch(() => false)) {
