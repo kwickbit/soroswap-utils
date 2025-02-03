@@ -93,21 +93,11 @@ const getSoroswapRouterEvents = async (
         true,
     )) as RawRouterEvent[];
 
-    // At this point I have two main hypotheses: either we get some event that
-    // parseRouterEvent cannot handle (possibly because its `topic2` is not one
-    // of add, init, remove, swap), or parsing one of the events fails. I'd bet
-    // it's the latter, with the error related to an asset; I need to figure
-    // out the asset fetching thing urgently, and maybe even hard-code it.
-
-    if (rawEvents.some((event) => !["add", "init", "remove", "swap"].includes(event.topic2))) {
-        console.log("There is some event whose topic is not quite right.");
-    } else {
-        console.log("The problem most likely is in fetching assets.");
-    }
-
     if (options?.shouldReturnRawEvents !== undefined && options.shouldReturnRawEvents) {
         return rawEvents;
     }
+
+    console.log("\n\n\nAt this point, we should get a ton of logs from `getCachedOrFetch`.");
 
     return await Promise.all(rawEvents.map(parseRouterEvent));
 };

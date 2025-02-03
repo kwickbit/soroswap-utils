@@ -80,20 +80,31 @@ const readCache = async (): Promise<CacheEntry> => {
     return JSON.parse(content) as CacheEntry;
 };
 
+// eslint-disable-next-line max-statements
 const getCachedOrFetch = async (): Promise<AssetData> => {
     try {
         const cache = await readCache();
         const isDataFresh = Date.now() - cache.timestamp < cacheTtl;
 
         if (!isDataFresh) {
+            console.log(
+                "ERROR: fetching assets from the network when they should be read from cache.",
+            );
+
             return await fetchAssets();
         }
+
+        console.log("Using cached assets, which means the error is not here.");
 
         const isTestnet = getConfig().rpc.url.includes("testnet");
 
         if (!isTestnet) {
+            console.log("Fetching assets from mainnet, as it should be.");
+
             return cache.data as MainnetResponse;
         }
+
+        console.log("ERROR: fetching assets from testnet, as it should NOT be.");
 
         return cache.data as TestnetData;
     } catch {

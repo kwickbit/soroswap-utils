@@ -110,12 +110,18 @@ var getCachedOrFetch = async () => {
     const cache = await readCache();
     const isDataFresh = Date.now() - cache.timestamp < cacheTtl;
     if (!isDataFresh) {
+      console.log(
+        "ERROR: fetching assets from the network when they should be read from cache."
+      );
       return await fetchAssets();
     }
+    console.log("Using cached assets, which means the error is not here.");
     const isTestnet = getConfig().rpc.url.includes("testnet");
     if (!isTestnet) {
+      console.log("Fetching assets from mainnet, as it should be.");
       return cache.data;
     }
+    console.log("ERROR: fetching assets from testnet, as it should NOT be.");
     return cache.data;
   } catch {
     return await fetchAssets();
@@ -498,14 +504,10 @@ var getSoroswapRouterEvents = async (options) => {
     "SOROSWAP_ROUTER_CONTRACT",
     true
   );
-  if (rawEvents.some((event) => !["add", "init", "remove", "swap"].includes(event.topic2))) {
-    console.log("There is some event whose topic is not quite right.");
-  } else {
-    console.log("The problem most likely is in fetching assets.");
-  }
   if (options?.shouldReturnRawEvents !== void 0 && options.shouldReturnRawEvents) {
     return rawEvents;
   }
+  console.log("\n\n\nAt this point, we should get a ton of logs from `getCachedOrFetch`.");
   return await Promise.all(rawEvents.map(parseRouterEvent));
 };
 var getSoroswapPairEvents = async (contractId, options) => {
