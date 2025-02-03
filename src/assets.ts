@@ -80,7 +80,6 @@ const readCache = async (): Promise<CacheEntry> => {
     return JSON.parse(content) as CacheEntry;
 };
 
-// eslint-disable-next-line max-statements
 const getCachedOrFetch = async (): Promise<AssetData> => {
     try {
         const cache = await readCache();

@@ -1,9 +1,9 @@
-/* eslint-disable camelcase */
-/* eslint-disable @typescript-eslint/naming-convention */
+/* eslint-disable camelcase, @typescript-eslint/naming-convention */
 import { describe, expect, it } from "@jest/globals";
 
 import { parseRouterEvent } from "../event_parsers/router";
 import type {
+    Asset,
     RawRouterInitEvent,
     RawRouterLiquidityEvent,
     RawRouterSwapEvent,
@@ -14,7 +14,12 @@ import type {
 } from "../types";
 
 describe("parseRouterEvent", () => {
-    it("correctly parses an add liquidity event", async () => {
+    const assets = [
+        { contract: "TOKEN_A", isSoroswapCertified: false },
+        { contract: "TOKEN_B", isSoroswapCertified: false },
+    ] as Asset[];
+
+    it("correctly parses an add liquidity event", () => {
         expect.assertions(1);
 
         const rawEvent = {
@@ -55,10 +60,10 @@ describe("parseRouterEvent", () => {
             timestamp: 456,
         };
 
-        await expect(parseRouterEvent(rawEvent)).resolves.toStrictEqual(expectedEvent);
+        expect(parseRouterEvent(assets, rawEvent)).toStrictEqual(expectedEvent);
     });
 
-    it("correctly parses an init event", async () => {
+    it("correctly parses an init event", () => {
         expect.assertions(1);
 
         const rawEvent = {
@@ -77,10 +82,10 @@ describe("parseRouterEvent", () => {
             timestamp: 456,
         };
 
-        await expect(parseRouterEvent(rawEvent)).resolves.toStrictEqual(expectedEvent);
+        expect(parseRouterEvent(assets, rawEvent)).toStrictEqual(expectedEvent);
     });
 
-    it("correctly parses a remove liquidity event", async () => {
+    it("correctly parses a remove liquidity event", () => {
         expect.assertions(1);
 
         const rawEvent = {
@@ -121,10 +126,10 @@ describe("parseRouterEvent", () => {
             timestamp: 456,
         };
 
-        await expect(parseRouterEvent(rawEvent)).resolves.toStrictEqual(expectedEvent);
+        expect(parseRouterEvent(assets, rawEvent)).toStrictEqual(expectedEvent);
     });
 
-    it("correctly parses a swap event", async () => {
+    it("correctly parses a swap event", () => {
         expect.assertions(1);
 
         const rawEvent = {
@@ -151,6 +156,6 @@ describe("parseRouterEvent", () => {
             ],
         };
 
-        await expect(parseRouterEvent(rawEvent)).resolves.toStrictEqual(expectedEvent);
+        expect(parseRouterEvent(assets, rawEvent)).toStrictEqual(expectedEvent);
     });
 });

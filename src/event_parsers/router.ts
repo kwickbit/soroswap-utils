@@ -1,6 +1,5 @@
 import type {
     Asset,
-    AssetData,
     RawRouterEvent,
     RawRouterInitEvent,
     RawRouterLiquidityEvent,
@@ -13,8 +12,8 @@ import type {
 } from "../types";
 import { parseCommonProperties } from "./common";
 
-const doGetAssetData = (assets: AssetData, token: string): Asset => {
-    const assetData = assets.assets.find((asset) => asset.contract === token);
+const doGetAssetData = (assets: readonly Asset[], token: string): Asset => {
+    const assetData = assets.find((asset) => asset.contract === token);
 
     // We have full data for a list of certified assets, but it is possible to
     // have other tokens in pools, and those we don't have data for.
@@ -27,7 +26,7 @@ const doGetAssetData = (assets: AssetData, token: string): Asset => {
 
 const parseRouterAddLiquidityEvent = (
     rawEvent: RawRouterLiquidityEvent & { readonly topic2: "add" },
-    assets: AssetData,
+    assets: readonly Asset[],
 ): RouterAddLiquidityEvent => ({
     ...parseCommonProperties(rawEvent),
     amountOfFirstTokenDeposited: BigInt(rawEvent.amount_a),
@@ -46,7 +45,7 @@ const parseRouterInitEvent = (rawEvent: RawRouterInitEvent): RouterInitializedEv
 
 const parseRouterRemoveLiquidityEvent = (
     rawEvent: RawRouterLiquidityEvent & { readonly topic2: "remove" },
-    assets: AssetData,
+    assets: readonly Asset[],
 ): RouterRemoveLiquidityEvent => ({
     ...parseCommonProperties(rawEvent),
     amountOfFirstTokenWithdrawn: BigInt(rawEvent.amount_a),
@@ -60,7 +59,7 @@ const parseRouterRemoveLiquidityEvent = (
 
 const parseRouterSwapEvent = (
     rawEvent: RawRouterSwapEvent,
-    assets: AssetData,
+    assets: readonly Asset[],
 ): RouterSwapEvent => ({
     ...parseCommonProperties(rawEvent),
     recipientAddress: rawEvent.to,
@@ -69,7 +68,7 @@ const parseRouterSwapEvent = (
     tradedTokenSequence: rawEvent.path.map((token) => doGetAssetData(assets, token)),
 });
 
-const parseRouterEvent = (rawEvent: RawRouterEvent, assets: AssetData): RouterEvent => {
+const parseRouterEvent = (assets: readonly Asset[], rawEvent: RawRouterEvent): RouterEvent => {
     switch (rawEvent.topic2) {
         case "add": {
             return parseRouterAddLiquidityEvent(

@@ -98,9 +98,9 @@ const getSoroswapRouterEvents = async (
         return rawEvents;
     }
 
-    const assets = await getCachedOrFetch();
+    const assetData = await getCachedOrFetch();
 
-    return rawEvents.map((event) => parseRouterEvent(event, assets));
+    return rawEvents.map((event) => parseRouterEvent(assetData.assets, event));
 };
 
 /**
