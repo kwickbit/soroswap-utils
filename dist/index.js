@@ -102,30 +102,20 @@ var fetchAssets = async () => {
 };
 var readCache = async () => {
   const isTestnet = getConfig().rpc.url.includes("testnet");
-  const file = isTestnet ? testnetCacheFile : mainnetCacheFile;
-  console.log(`Reading cache from ${file} on ${isTestnet ? "testnet" : "mainnet"}.`);
-  console.log("Expected: reading node_modules/soroswap-utils/.cache/assets.json on mainnet.");
-  const content = await readFile(file, "utf8");
+  const content = await readFile(isTestnet ? testnetCacheFile : mainnetCacheFile, "utf8");
   return JSON.parse(content);
 };
 var getCachedOrFetch = async () => {
   try {
     const cache = await readCache();
-    console.log("Successfully read cache.");
     const isDataFresh = Date.now() - cache.timestamp < cacheTtl;
     if (!isDataFresh) {
-      console.log(
-        "ERROR: fetching assets from the network when they should be read from cache."
-      );
       return await fetchAssets();
     }
-    console.log("Using cached assets, which means the error is not here.");
     const isTestnet = getConfig().rpc.url.includes("testnet");
     if (!isTestnet) {
-      console.log("Fetching assets from mainnet, as it should be.");
       return cache.data;
     }
-    console.log("ERROR: fetching assets from testnet, as it should NOT be.");
     return cache.data;
   } catch {
     return await fetchAssets();
@@ -520,7 +510,6 @@ var getSoroswapRouterEvents = async (options) => {
   if (options?.shouldReturnRawEvents !== void 0 && options.shouldReturnRawEvents) {
     return rawEvents;
   }
-  console.log("\n\n\nAt this point, we should get just one log from `getCachedOrFetch`.");
   const assets = await getCachedOrFetch();
   return rawEvents.map((event) => parseRouterEvent(event, assets));
 };

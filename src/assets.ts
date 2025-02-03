@@ -75,12 +75,7 @@ const fetchAssets = async (): Promise<AssetData> => {
 
 const readCache = async (): Promise<CacheEntry> => {
     const isTestnet = getConfig().rpc.url.includes("testnet");
-    const file = isTestnet ? testnetCacheFile : mainnetCacheFile;
-
-    console.log(`Reading cache from ${file} on ${isTestnet ? "testnet" : "mainnet"}.`);
-    console.log("Expected: reading node_modules/soroswap-utils/.cache/assets.json on mainnet.");
-
-    const content = await readFile(file, "utf8");
+    const content = await readFile(isTestnet ? testnetCacheFile : mainnetCacheFile, "utf8");
 
     return JSON.parse(content) as CacheEntry;
 };
@@ -89,30 +84,17 @@ const readCache = async (): Promise<CacheEntry> => {
 const getCachedOrFetch = async (): Promise<AssetData> => {
     try {
         const cache = await readCache();
-
-        console.log("Successfully read cache.");
-
         const isDataFresh = Date.now() - cache.timestamp < cacheTtl;
 
         if (!isDataFresh) {
-            console.log(
-                "ERROR: fetching assets from the network when they should be read from cache.",
-            );
-
             return await fetchAssets();
         }
-
-        console.log("Using cached assets, which means the error is not here.");
 
         const isTestnet = getConfig().rpc.url.includes("testnet");
 
         if (!isTestnet) {
-            console.log("Fetching assets from mainnet, as it should be.");
-
             return cache.data as MainnetResponse;
         }
-
-        console.log("ERROR: fetching assets from testnet, as it should NOT be.");
 
         return cache.data as TestnetData;
     } catch {

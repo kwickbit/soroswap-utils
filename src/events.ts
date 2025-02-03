@@ -98,8 +98,6 @@ const getSoroswapRouterEvents = async (
         return rawEvents;
     }
 
-    console.log("\n\n\nAt this point, we should get just one log from `getCachedOrFetch`.");
-
     const assets = await getCachedOrFetch();
 
     return rawEvents.map((event) => parseRouterEvent(event, assets));
