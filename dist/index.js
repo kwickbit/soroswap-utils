@@ -378,7 +378,7 @@ var parsePairEvent = (rawEvent) => {
 
 // src/event_parsers/router.ts
 var doGetAssetData = (assets, token) => {
-  const assetData = assets.assets.find((asset) => asset.contract === token);
+  const assetData = assets.find((asset) => asset.contract === token);
   if (assetData === void 0) {
     return { contract: token, isSoroswapCertified: false };
   }
@@ -414,7 +414,7 @@ var parseRouterSwapEvent = (rawEvent, assets) => ({
   tokenAmountsInSequence: rawEvent.amounts.map(BigInt),
   tradedTokenSequence: rawEvent.path.map((token) => doGetAssetData(assets, token))
 });
-var parseRouterEvent = (rawEvent, assets) => {
+var parseRouterEvent = (assets, rawEvent) => {
   switch (rawEvent.topic2) {
     case "add": {
       return parseRouterAddLiquidityEvent(
@@ -510,8 +510,8 @@ var getSoroswapRouterEvents = async (options) => {
   if (options?.shouldReturnRawEvents !== void 0 && options.shouldReturnRawEvents) {
     return rawEvents;
   }
-  const assets = await getCachedOrFetch();
-  return rawEvents.map((event) => parseRouterEvent(event, assets));
+  const assetData = await getCachedOrFetch();
+  return rawEvents.map((event) => parseRouterEvent(assetData.assets, event));
 };
 var getSoroswapPairEvents = async (contractId, options) => {
   const rawEvents = await fetchSoroswapEvents(contractId);

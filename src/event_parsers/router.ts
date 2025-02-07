@@ -64,7 +64,6 @@ const parseRouterSwapEvent = (
     ...parseCommonProperties(rawEvent),
     recipientAddress: rawEvent.to,
     tokenAmountsInSequence: rawEvent.amounts.map(BigInt),
-
     tradedTokenSequence: rawEvent.path.map((token) => doGetAssetData(assets, token)),
 });
 
